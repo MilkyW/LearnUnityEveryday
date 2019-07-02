@@ -33,7 +33,7 @@ Use <u>contrast color</u> and <u>motion</u> to attract the player.
 | shouldn’t be animated and moved by its Transform | can be animated and moved by its Transform <u>only</u> |
 |  | like elevators, moving platforms and objects with triggers |
 
-![Static and Dynamic Physics](https://github.com/MilkyW/UnityFEIntern/blob/master/Pictures/Static%20and%20Dynamic%20Physics.png?raw=true)
+![Static and Dynamic Physics](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/Static%20and%20Dynamic%20Physics.png?raw=true)
 
 **Static & Dynamic:** Collider and Rigidbody.
 
@@ -197,7 +197,7 @@ StopCoroutine(FunctionName);
 
 **Quaternions:** more difficult to understand than Euler Angle but not subjected to the gimbal lock(prevent incremental rotations), XYZW are <u>interdependent</u> and shouldn't be adjusted individually, use the built-in method instead
 
-![Lerp and Slerp](https://github.com/MilkyW/UnityFEIntern/blob/master/Pictures/Lerp%20and%20Slerp.png?raw=true)
+![Lerp and Slerp](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/Lerp%20and%20Slerp.png?raw=true)
 
 **Lurp:** linear interpolation, interpolate evenly
 
@@ -253,7 +253,7 @@ OnStateEnter/Update/Exit->Animation Clip in Animator
 **Event Trigger in Canvas:** No <u>canvas renderer</u> in the area, <u>UGUI block</u>: Transition->Pointer ScrollView Content->Drag
 
 ### iOS Develope
-![Apple Develop](https://github.com/MilkyW/UnityFEIntern/blob/master/Pictures/Apple%20Develop.png?raw=true)
+![Apple Develop](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/Apple%20Develop.png?raw=true)
 
 **Apple Developer account:**
 

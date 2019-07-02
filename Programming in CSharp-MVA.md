@@ -1,6 +1,6 @@
 # 201303_Programming in CSharp_MVA
 
-![Programming-in-CSharp Agenda](https://github.com/MilkyW/UnityFEIntern/blob/master/Pictures/Programming-in-CSharp%20Agenda.png?raw=true)
+![Programming-in-CSharp Agenda](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/Programming-in-CSharp%20Agenda.png?raw=true)
 
 http://blog.jerrynixon.com/2014/01/free-c-training-for-beginners-and.html
 
@@ -39,7 +39,7 @@ What is a Managed Language? depend on services provided by a runtime environment
 
 **C# & Polymorphism:** A class can be used as its own type, cast to any base types or interface types it implements. Objects may methods as virtual; virtual methods may be overridden in a derived type. These are executed instead of the base implementation.
 
-![CSharp Evolvement](https://github.com/MilkyW/UnityFEIntern/blob/master/Pictures/CSharp%20Evolvement.png?raw=true)
+![CSharp Evolvement](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/CSharp%20Evolvement.png?raw=true)
 
 **Developer Productivity:** From the outset, C# focused on making it easier for developers to solve complex tasks without compromising elegance.
 

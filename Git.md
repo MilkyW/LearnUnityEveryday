@@ -13,7 +13,7 @@ error: The following untracked working tree files would be overwritten by checko
 
 [git无法切换分支](https://blog.csdn.net/lisulong1/article/details/78910727)
 
-![git rebase](https://github.com/MilkyW/UnityFEIntern/blob/master/Pictures/git%20rebase.png?raw=true)
+![git rebase](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/git%20rebase.png?raw=true)
 
 **rebase:**
 
