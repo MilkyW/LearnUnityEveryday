@@ -1,5 +1,7 @@
 # Unity VS 2019开发环境搭建
 
+**注意：如果有已经安装了的同学，但是安装的版本和要求有出入的话，还请大家尽量按照教程重新装一下。Unity版本是2019.1.8f1+离线文档，Visual Studio是2019+使用Unity的游戏开发。如果只是部分组件没有添加的话，可以打开Unity Hub和Visual Studio Installer进行修改。**
+
 ## 安装Unity 2019
  
  ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-01.png?raw=true)
@@ -64,7 +66,7 @@
  
 **1、下载社区（免费）版下载器。**
 
-**下载地址：**https://visualstudio.microsoft.com/zh-hans/downloads/
+**下载地址：** https://visualstudio.microsoft.com/zh-hans/downloads/
 
 **2、等待传输完成并打开下载器。如果询问是否给予管理员权限/允许修改设备，选是。**
 
