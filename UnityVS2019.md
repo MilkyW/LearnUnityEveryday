@@ -82,7 +82,11 @@
 
 **2、使用迅雷等下载器打开种子。Windows用户仅选择Windows文件夹下的UnitySetup64.exe文件，Mac用户仅选择MacOSX文件夹下的Unity.pkg文件。**
 
+**3、打开离线安装包并安装。推荐将安装目录选为非系统磁盘。在选择组件时推荐勾选Documentation和简体中文语言包，其他组件暂无必要勾选。**
+
 **注：本方法仍推荐下载安装并配置Unity Hub，请完成方法一中的步骤1-11后再继续接下来的步骤。**
+
+**【正在施工中】**
 
 ## 安装Visual Studio 2019
  
@@ -112,7 +116,7 @@
 
  ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/2-06.png?raw=true)
 
-**（可选）7、选择安装到非系统盘并点击确定。**
+**（可选）7、选择安装到非系统磁盘并点击确定。**
 
 **8、等待传输和安装完成。**
 
