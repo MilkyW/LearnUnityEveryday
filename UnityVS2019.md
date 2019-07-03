@@ -152,14 +152,16 @@
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-06.png?raw=true)
 
-**（可选）4、如没有这个选项，选择Browse..，选中Visual Studio安装目录下对应版本文件夹下的Common7文件夹下的IDE文件夹中的devenv.exe，点击打开。External Script Editor可选列表中应出现Visual Studio 2019。**
-
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-07.png?raw=true)
 
-**5、在Project窗口中右键，选择Create，选择C# Script，随意命名后双击打开。**
+**（可选）4、如没有这个选项，选择Browse..，选中Visual Studio安装目录下对应版本文件夹下的Common7文件夹下的IDE文件夹中的devenv.exe，点击打开。External Script Editor可选列表中应出现Visual Studio 2019。**
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-08.png?raw=true)
 
+**5、在Project窗口中右键，选择Create，选择C# Script，随意命名后双击打开。**
+
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-09.png?raw=true)
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-10.png?raw=true)
 
 **6、等待Visual Studio 2019自动启动完毕。点击上方附加到Unity，等待左下角出现就绪字样。至此，确认配置完成。**
