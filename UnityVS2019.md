@@ -140,7 +140,7 @@
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-03.png?raw=true)
 
-**2、选择3D模版，可以更改项目名称和目录，点击创建。等待创建完成，项目自动打开。**
+**2、选择3D模版，可以更改项目名称和目录（整个路径不可有中文，不可有空格！否则将报错：Creating Project folder failed!），点击创建。等待创建完成，项目自动打开。**
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-04.png?raw=true)
 
