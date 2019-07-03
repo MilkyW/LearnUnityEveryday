@@ -4,6 +4,8 @@
 
 ## 安装Unity 2019
  
+### 方法一：Unity Hub
+
  ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-01.png?raw=true)
 
 **1、下载Unity Hub**
@@ -65,6 +67,18 @@
 **13、点击安装。选择Unity2019.1.8f1，点击下一步。选择Documentation和简体中文，点击完成。如果询问是否给予管理员权限/允许修改设备，选是。**
 
 **14、等待安装完成。**
+
+### 方法二：离线安装包
+
+**1、通过Torrent种子获取离线安装包。**
+
+**下载地址：** https://download.unity3d.com/download_unity/7938dd008a75/Unity-2019.1.8f1.torrent?_ga=2.240658244.690207845.1562122811-320400500.1544670943
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-16.png?raw=true)
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-17.png?raw=true)
+
+**2、使用迅雷等下载器打开种子。Windows用户仅选择Windows文件夹下的UnitySetup64.exe文件，Mac用户仅选择MacOSX文件夹下的Unity.pkg文件。**
 
 ## 安装Visual Studio 2019
  
