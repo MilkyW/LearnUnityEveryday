@@ -86,7 +86,15 @@
 
 **注：本方法仍推荐下载安装并配置Unity Hub，请完成方法一中的步骤1-11后再继续接下来的步骤。**
 
-**【正在施工中】**
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-18.png?raw=true)
+
+**4、打开Unity Hub，选择安装菜单，点击添加已安装版本。**
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-19.png?raw=true)
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-20.png?raw=true)
+
+**5、选择刚才安装目录下对应版本文件夹下Editor文件夹中的Unity.exe，点击Select Editor。安装菜单中应出现对应版本的Unity。**
 
 ## 安装Visual Studio 2019
  
