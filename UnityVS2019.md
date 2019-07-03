@@ -44,19 +44,23 @@
 
 **10、选择Unity个人版，选择不以专业身份使用Unity，点击完成。等待许可证激活成功。**
 
-**（可选）11、点击常规菜单，选择Unity安装路径并保存。**
-
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-09.png?raw=true)
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-10.png?raw=true)
+
+**（可选）11、点击常规菜单，选择Unity安装路径并保存。**
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-11.png?raw=true)
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-12.png?raw=true)
  
 **12、返回主界面。点击安装菜单。**
 
-![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-11.png?raw=true)
- 
-![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-12.png?raw=true)
-
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-13.png?raw=true)
+ 
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-14.png?raw=true)
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-15.png?raw=true)
  
 **13、点击安装。选择Unity2019.1.8f1，点击下一步。选择Documentation和简体中文，点击完成。如果询问是否给予管理员权限/允许修改设备，选是。**
 
