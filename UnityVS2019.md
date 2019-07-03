@@ -132,6 +132,24 @@
 
 ## 连接Unity和Visual Studio
 
-**【正在施工中】**
+ ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-01.png?raw=true)
 
-**1、打开Unity Hub。**
+ ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-02.png?raw=true)
+
+**1、打开Unity Hub。点击新建右边的下三角，选择Unity2019.1.8f1版本。**
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-03.png?raw=true)
+
+**2、选择3D模版，可以更改项目名称和目录，点击创建。等待创建完成，项目自动打开。**
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-04.png?raw=true)
+
+**3、选择菜单栏中的Edit，选择Preferences..**
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-05.png?raw=true)
+
+**3、在弹出的窗口中，选择External Tools菜单，在External Script Editor中选择Visual Studio 2019(Community)。**
+
+![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-06.png?raw=true)
+
+**（可选）4、如没有这个选项，选择Browse..，选中Visual Studio安装目录下对应版本文件夹下的Common7文件夹下的IDE文件夹中的devenv.exe，点击打开。External Script Editor可选列表中应出现Visual Studio 2019。**
