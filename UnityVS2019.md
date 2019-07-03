@@ -26,17 +26,17 @@
 
  ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-04.png?raw=true)
 
-**8、选择使用微信登陆，并用手机微信扫码，在手机上点击同意。登陆成功。**
+**8、选择使用微信登陆，并用手机微信扫码，在手机上点击同意。**
  
  ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-05.png?raw=true)
 
  ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-06.png?raw=true)
 
-**也可以用其他方式注册Unity账户。**
+**也可以用其他方式注册Unity账户，并在Unity Hub中登陆。**
 
  ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-07.png?raw=true)
 
-**9、点击激活新许可证。**
+**9、登陆成功后，点击激活新许可证。**
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-08.png?raw=true)
 
