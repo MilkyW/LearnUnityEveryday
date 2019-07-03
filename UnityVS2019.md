@@ -148,9 +148,9 @@
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-05.png?raw=true)
 
-**3、在弹出的窗口中，选择External Tools菜单，在External Script Editor中选择Visual Studio 2019(Community)。**
-
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-06.png?raw=true)
+
+**3、在弹出的窗口中，选择External Tools菜单，在External Script Editor中选择Visual Studio 2019(Community)。**
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/3-07.png?raw=true)
 
