@@ -1,6 +1,6 @@
 # Unity VS 2019开发环境搭建
 
-**注意：如果有已经安装了的同学，但是安装的版本和要求有出入的话，还请大家尽量按照教程重新装一下。Unity版本是2019.1.8f1+离线文档，Visual Studio是2019+使用Unity的游戏开发。如果只是部分组件没有添加的话，可以打开Unity Hub和Visual Studio Installer进行修改。**
+**注意：如果有已经自行安装了这两个软件的同学，请检查安装的版本是否和要求一致。如有出入，请尽量按照教程重新安装一次。Unity版本是2019.1.8f1+离线文档，Visual Studio版本是2019+使用Unity的游戏开发。如果只是部分组件没有添加的话，可以打开Unity Hub和Visual Studio Installer进行修改。**
 
 ## 安装Unity 2019
  
