@@ -1,6 +1,6 @@
 # Unity VS 2019开发环境搭建
 
-**注意：如果有已经自行安装了这两个软件的同学，请检查安装的版本是否和要求一致。如有出入，请尽量按照教程重新安装一次。Unity版本是2019.1.8f1+离线文档，Visual Studio版本是2019+使用Unity的游戏开发。如果只是部分组件没有添加的话，可以打开Unity Hub和Visual Studio Installer进行修改。**
+**注意：如果有已经自行安装了这两个软件的同学，请检查安装的版本是否和要求一致。如有出入，请尽量按照教程重新安装一次。Unity版本是2019.1.8f1+离线文档，Visual Studio版本是2019+使用Unity的游戏开发。如果只是部分组件没有添加的话，可以打开Unity Hub和Visual Studio Installer进行修改。两个软件及组件都按照要求安装完毕后，请跳转至第三步：连接Unity和Visual Studio。**
 
 ## 安装Unity 2019
  
@@ -44,11 +44,13 @@
 
 **10、选择Unity个人版，选择不以专业身份使用Unity，点击完成。等待许可证激活成功。**
 
+**（可选）11、点击常规菜单，选择Unity安装路径并保存。**
+
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-09.png?raw=true)
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-10.png?raw=true)
  
-**11、返回主界面。点击安装菜单。**
+**12、返回主界面。点击安装菜单。**
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-11.png?raw=true)
  
@@ -56,9 +58,9 @@
 
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-13.png?raw=true)
  
-**12、点击安装。选择Unity2019.1.8f1，点击下一步。选择Documentation和简体中文，点击完成。如果询问是否给予管理员权限/允许修改设备，选是。**
+**13、点击安装。选择Unity2019.1.8f1，点击下一步。选择Documentation和简体中文，点击完成。如果询问是否给予管理员权限/允许修改设备，选是。**
 
-**13、等待安装完成。**
+**14、等待安装完成。**
 
 ## 安装Visual Studio 2019
  
