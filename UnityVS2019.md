@@ -70,6 +70,8 @@
 
 ### 方法二：离线安装包
 
+**注意：如果身边有人已经下载完了可以问ta拷一份，如果自己下载完了可以拷给还没下载完的人。**
+
 **1、通过Torrent种子获取离线安装包。**
 
 **下载地址：** https://download.unity3d.com/download_unity/7938dd008a75/Unity-2019.1.8f1.torrent?_ga=2.240658244.690207845.1562122811-320400500.1544670943
@@ -79,6 +81,8 @@
 ![](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/UnityVS2019/1-17.png?raw=true)
 
 **2、使用迅雷等下载器打开种子。Windows用户仅选择Windows文件夹下的UnitySetup64.exe文件，Mac用户仅选择MacOSX文件夹下的Unity.pkg文件。**
+
+**注：本方法仍推荐下载安装并配置Unity Hub，请完成方法一中的步骤1-11后再继续接下来的步骤。**
 
 ## 安装Visual Studio 2019
  
