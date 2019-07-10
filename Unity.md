@@ -251,19 +251,3 @@ OnStateEnter/Update/Exit->Animation Clip in Animator
 **CanvasRenderer:** 并不是Renderer的子类。
 
 **Event Trigger in Canvas:** No <u>canvas renderer</u> in the area, <u>UGUI block</u>: Transition->Pointer ScrollView Content->Drag
-
-### iOS Develope
-![Apple Develop](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/Apple%20Develop.png?raw=true)
-
-**Apple Developer account:**
-
-[Building iOS Application](https://confluence.hq.unity3d.com/display/QA/Building+iOS+Application)
-
-**macOS, Xcode and iOS SDK:**
-**Xcode 10.1:** highest for macOS 10.13.x
-
-[Xcode_10.1.xip](https://drive.google.com/file/d/1L0A81DdYBrOUYlG1Xi1C49_uSvSG_71l/view?usp=sharing)
-
-[Xcode_10.1.xip](https://download.developer.apple.com/Developer_Tools/Xcode_10.1/Xcode_10.1.xip)
-
-**iOS SDK:** copy from higher versions of Xcode
