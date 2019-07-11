@@ -66,6 +66,28 @@ gameObject.**CompareTag(tag)** is more efficient than gameObject.tag == tag. Tag
 **Collider:** The physics system thinks a single solid object shouldn't be in the middle of another single solid object. The physics engine's solution is to push the two objects apart by adding forces to any attached rigidbody.
 It's fairly common for colliders to overlap each other when laying out levels using static non-moving objects.
 
+### Space Shooter Tutorial
+
+**mesh collider:** not performant, use compound collider of primitive colliders instead. in case have to use, use simplified mesh.
+
+**VFX:** billboard, always facing the camera
+
+**move the player or the camera?**
+
+**lights come from:** Light Component, Camera clear flags(skybox or solid colour), render settings/ambient light
+
+**ambient light:** from no fixed point(have no directionality) and lights all surfaces in the scene. used to add a general colour or full white light to all objects in the scene. set to black to turn off.
+
+**directional light:** only rotation, not position works
+
+**3 point lighting system:** a main(key) light, a fill light and a rim light to show off the shapes of objects and give a good sense of atmosphere
+
+**main(key) light:** brightest and most important. tilt to see the shape but not wash it out. feel like the light from a nearby sun, increase the intensity to give a hot feeling. seem realistic for some deep space environment
+
+**fill light:** the other side is far too dark, to light this side to fill in the shadows of the far side in a way that compliments the main light. reduced intensity and a hint of blue will tell that this is a secondary light. rotate to catch the rear edge but on the same side as the fill. show the edge well but also acting like a second fill light, due to how much light spilled on the object, rotate and drop the intensity
+
+**rim light:** fairly subtle. use pure white to be fairly clear and stand out when mixing in with the fill light. light the rear in a way that compliments the fill light.
+
 ### Beginner Gameplay Scripting
 
 **Do-while loop:** ended by ;
