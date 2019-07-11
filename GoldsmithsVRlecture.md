@@ -1,5 +1,7 @@
 # VR & Game Development Lecture
 
+![Goldsmiths VR Lecture Poster](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/GoldsmithsVRLecture.jpeg?raw=true)
+
 ## Introduction
 
 **Goldsmiths College of London University:**
