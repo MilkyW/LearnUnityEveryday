@@ -1,4 +1,5 @@
 ### Using the Unity Interface Tutorial
+
 **Scene View**
 **Tool change:** QWERT
 
@@ -17,6 +18,7 @@
 **Inspector Debug Mode**
 
 ### Roll-a-ball Tutorial
+
 **Principle:**
 Test early and test often.
 Use <u>contrast color</u> and <u>motion</u> to attract the player.
@@ -65,6 +67,7 @@ gameObject.**CompareTag(tag)** is more efficient than gameObject.tag == tag. Tag
 It's fairly common for colliders to overlap each other when laying out levels using static non-moving objects.
 
 ### Beginner Gameplay Scripting
+
 **Do-while loop:** ended by ;
 
 **Update():** Called just before every frame; Used for moving non-physics objects, simple timers, receiving input; update interval times vary
@@ -83,7 +86,7 @@ Mathf/Vector3/Color.**Lerp**(from, to, percentage)
 
 **SmoothDamp:** used to smooth a value over time
 
-**GetButtion**>**GetKey**
+**GetButton**>**GetKey**
 
 **GetAxis:** (sensitivity + gravity)/GetAxisRaw(1/0, not smooth), snap(up + down = 0)
 
@@ -106,21 +109,22 @@ private int experience;
 public int Experience {
     get { return experience; }
     set { experience = value; }
-} 
+}
 
 public int Level {
     get { return experience / 1000; }
     set { experience = value * 1000; }
-} 
+}
 
 public int Health{ get; set; }
 ```
-**Proporties:** explicit defined get and set (also shorthand syntax) to encapsulate fields and gain control of access out side the class, used for security check/read-only/write-only
+
+**Properties:** explicit defined get and set (also shorthand syntax) to encapsulate fields and gain control of access out side the class, used for security check/read-only/write-only
 
 ```cs
 Input.GetButtonDown(“Fire1”);
 Vector3.zero;
-public class Enemy { 
+public class Enemy {
     public static int enemyCount = 0;
     public Enemy() { enemyCount++; }
 }
@@ -146,9 +150,9 @@ public class Enemy {
 
 ```cs
 // declared outside any class
-public interface IAbcable<T> { 
+public interface IAbcable<T> {
     returnType functionName(argList);
-} 
+}
 
 class ABC: MonoBehaviuor, IAbcable<typeName> {
     public returnType functionName(argList){ … }
@@ -162,8 +166,8 @@ ClassA implements InterfaceB, must public declare all of the methods, properties
 **List:** in order to use `Sort()`, implement IComparable<T> public int CompareTo(TypeName other)
 
 ```cs
-public static class ExtensionMethods { 
-    public static void ResetTransformation(this Transform trans) {     
+public static class ExtensionMethods {
+    public static void ResetTransformation(this Transform trans) {
         trans.position = Vector3.zero;
         trans.localRotation = Quaternion.identity;
         trans.localScale = new Vector3(1, 1, 1);
@@ -177,7 +181,7 @@ transform.ResetTransformation();
 
 must be placed in a non-generic static class(create a class specifically to contain them), used like instance method, static themselves. use ‘this’ before the typeName of the first parameter(the type being extended, will be the calling object implicitly).
 
-**Dictionary:** using System.Collections.Generic; TryGetValue(keyType key) safer(direct access will throw exception when not exists) but slightly slower. 
+**Dictionary:** using System.Collections.Generic; TryGetValue(keyType key) safer(direct access will throw exception when not exists) but slightly slower.
 
 ```cs
 IEnumerator FunctionName(argList){
@@ -199,9 +203,9 @@ StopCoroutine(FunctionName);
 
 ![Lerp and Slerp](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/Lerp%20and%20Slerp.png?raw=true)
 
-**Lurp:** linear interpolation, interpolate evenly
+**Lerp:** linear interpolation, interpolate evenly
 
-**Slurp:** spherical interpolation, interpolate on a curve(start and stop slower, faster in the middle)
+**Slerp:** spherical interpolation, interpolate on a curve(start and stop slower, faster in the middle)
 
 ```cs
 [Attribute(argList)]
@@ -222,7 +226,7 @@ delegateName(argList);
 
 **Delegates:** create robust and complex behaviours
 
-muti-casting:  `delegateName += FunctionName;` execute several functions in a single call(stack functionality) use `-=` to remove. check `!= null` before calling
+multi-casting:  `delegateName += FunctionName;` execute several functions in a single call(stack functionality) use `-=` to remove. check `!= null` before calling
 
 shouldn't count on its order.
 
@@ -240,6 +244,7 @@ public static event ClickAction OnClicked;
 [MessageSystem](https://github.com/KEEMU/MessageSystem)
 
 ### AR Foundation
+
 Unity 2018
 Package Manager
 
@@ -248,6 +253,7 @@ Package Manager
 OnStateEnter/Update/Exit->Animation Clip in Animator
 
 ### UGUI
+
 **CanvasRenderer:** 并不是Renderer的子类。
 
 **Event Trigger in Canvas:** No <u>canvas renderer</u> in the area, <u>UGUI block</u>: Transition->Pointer ScrollView Content->Drag
