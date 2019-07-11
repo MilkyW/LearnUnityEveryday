@@ -102,6 +102,26 @@ presence: a user's sense of being there in an environment represented through me
 
 - Adverse physiological reactions(e.g. headache, eyestrain)
 
-merge organic structures using directly C++
+**Engagement & Impact:**
 
-deliverable
+- Audience Quality of Experience
+
+- Audience Attitudes(content & tech)
+
+- Creator's Intended Impacts
+
+- Audience Characteristics
+
+- Interaction Affordances
+
+- Economic Impacts
+
+- Audience Behaviours
+
+- Audience Traits(immersive tendencies)
+
+- Stakeholder Target Impacts
+
+**merge organic structures using directly C++:** artist
+
+**Deliverables:** Website, Web player, PC VR HMD, Mobile VR HMD, Bespoke app, Bespoke platform
