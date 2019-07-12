@@ -104,7 +104,7 @@ transform.**Translate/Rotate:** should be used for static collider/dynamic colli
 
 **transform.LookAt(transform):** changes local forward direction
 
-Mathf/Vector3/Color.**Lerp**(from, to, percentage)
+Mathf/Vector3/Color.**Lerp**(from, to, percentage) The parameter percentage is clamped to the range [0, 1].
 
 **SmoothDamp:** used to smooth a value over time
 
