@@ -50,3 +50,15 @@ To automatic refresh Xcode Swift project when built-in Unity project is re-built
 **3. Build and output to some temporary folder such as /tmp.**
 
 **4. Once build succeeded, open Xcode project, select target device (Unity does not support x86_64) and hit Build and then run. Change bundle identifier if Xcode has problem creating provisioning profile.**
+
+## Debug Swift Built-in Unity Xcode Project
+
+**before**
+
+**after**
+
+**1. Build a debug version of Unity engine to get libiPhone-lib-il2cpp-dev.a.**
+
+**2. Put libiPhone-lib-il2cpp-dev.a into ./Unity/Libraries, rename it to libiPhone-lib.a to substitute for the previous one.**
+
+**3. Set to DWARF with dSYM File in Xcode Project Settings.**
