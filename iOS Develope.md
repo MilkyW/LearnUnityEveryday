@@ -53,12 +53,20 @@ To automatic refresh Xcode Swift project when built-in Unity project is re-built
 
 ## Debug Swift Built-in Unity Xcode Project
 
-**before**
+![before debug mode](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/iOS%20Develope/before%20debug%20mode.jpeg?raw=true)
 
-**after**
+**before debug mode**
+
+![after debug mode](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/iOS%20Develope/after%20debug%20mode.jpeg?raw=true)
+
+**after debug mode**
 
 **1. Build a debug version of Unity engine to get libiPhone-lib-il2cpp-dev.a.**
 
+![change debug library](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/iOS%20Develope/change%20debug%20library.png?raw=true)
+
 **2. Put libiPhone-lib-il2cpp-dev.a into ./Unity/Libraries, rename it to libiPhone-lib.a to substitute for the previous one.**
+
+![open debug switch](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/iOS%20Develope/open%20debug%20switch.png?raw=true)
 
 **3. Set to DWARF with dSYM File in Xcode Project Settings.**
