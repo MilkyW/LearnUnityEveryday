@@ -1,7 +1,7 @@
 # iOS Develope
 
 ## Build Environment & Permission
-![Apple Develop](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/Apple%20Develop.png?raw=true)
+![Apple Develop](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/iOS%20Develope/Apple%20Develop.png?raw=true)
 
 **Apple Developer account:**
 
@@ -17,19 +17,19 @@
 
 **Older Xcode with Newer iOS:** 
 
-![Xcode iOS intallation dictory](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/Xcode%20iOS%20intallation%20dictory.png?raw=true)
+![Xcode iOS intallation dictory](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/iOS%20Develope/Xcode%20iOS%20intallation%20dictory.png?raw=true)
 
 **1. Copy newer iOS SDK to Xcode Intallation Dictory**
 
 /Developer/Platforms/iPhoneOS.platform/DeviceSupport
 
-![SDKSettings](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/SDKSettings.png?raw=true)
+![SDKSettings](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/iOS%20Develope/SDKSettings.png?raw=true)
 
 **2. Add newer iOS SDK version to SDKSettings.plist**
 
 /Developer/Platforms/iPhoneOS.platform/Developer/SDKs/IphoneOS.sdk/SDKSettings.plist
 
-![Deployment](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/Deployment.png?raw=true)
+![Deployment](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/iOS%20Develope/Deployment.png?raw=true)
 
 **3. Restart Xcode and choose deployment target in targets settings**
 
@@ -43,7 +43,7 @@ To automatic refresh Xcode Swift project when built-in Unity project is re-built
 
 **1. Open Unity project, open Demo scene, open Build Settings and switch to iOS platform**
 
-![XcodePostBuild](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/XcodePostBuild.png?raw=true)
+![XcodePostBuild](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/iOS%20Develope/XcodePostBuild.png?raw=true)
 
 **2. Click on Tools/SwiftUnity in manu and put in Xcode Project File in Settings**
 
