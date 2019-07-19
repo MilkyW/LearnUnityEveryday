@@ -20,6 +20,18 @@ Movement(移动)
 
 **第三人称相机:**
 
+![Basic Setup](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/GD%20Camera/Basic%20Setup.png?raw=true)
+
+![Vertical Follow](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/GD%20Camera/Vertical%20Follow.png?raw=true)
+
+![Free Move Cylinder](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/GD%20Camera/Free%20Move%20Cylinder.png?raw=true)
+
+![Standard Follow Mode](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/GD%20Camera/Standard%20Follow%20Mode.png?raw=true)
+
+![Free Cam Controls](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/GD%20Camera/Free%20Cam%20Controls.png?raw=true)
+
+![Free Cam Follow Mode](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/GD%20Camera/Free%20Cam%20Follow%20Mode.png?raw=true)
+
 ```cs
     private void FixedUpdate()
     {
