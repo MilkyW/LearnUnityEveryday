@@ -17,3 +17,31 @@ FOV(Field of View, 视野):速度感
 Projection(投影)
 
 Movement(移动)
+
+**第三人称相机:**
+
+```cs
+    private void FixedUpdate()
+    {
+        AddjustFOV();
+        Vector3 see = GetJoyStickRight();
+        bool rerotate = false;
+
+        // renew position and rotation
+        if (System.Math.Abs(see.magnitude) < float.Epsilon)
+        {
+            if (!freeMoveCylinderSettings.enabled || OutOfFreeMoveCylinder())
+                Basic();
+        }
+        else
+        {
+            FreeCameraControls(see);
+            rerotate = true;
+        }
+
+        // interpolate position and rotation
+        SmoothInterpolate(rerotate);
+
+        CollisionFix();
+    }
+```
