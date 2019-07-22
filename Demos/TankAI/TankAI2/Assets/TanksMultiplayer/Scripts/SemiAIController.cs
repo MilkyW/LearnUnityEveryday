@@ -115,16 +115,16 @@ namespace TanksMP
             GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
             RaycastHit raycastHit;
             float minDistance = float.MaxValue;
-            Vector3 origin = tankPlayer.transform.position;
+            Vector3 origin = tankPlayer.Position;
             origin.y = height;
             Vector3 hitPos = Vector3.zero;
             Vector3 turnDir = Vector2.zero;
             foreach (var pl in allplayer)
             {
-                Vector3 target = pl.transform.position;
+                var comp = pl.GetComponent<BasePlayer>();
+                Vector3 target = comp.Position;
                 target.y = height;
                 Debug.DrawLine(origin, target, Color.blue);
-                var comp = pl.GetComponent<BasePlayer>();
                 if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive
                     && (target - origin).magnitude < minDistance
                         && Physics.Raycast(origin, target - origin, out raycastHit, (target - origin).magnitude + 1.0f, ~layerMask)
