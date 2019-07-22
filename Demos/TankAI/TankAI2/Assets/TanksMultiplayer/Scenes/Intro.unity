@@ -11254,9 +11254,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a763043a3c959b49aef7387be9ce03c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  PlayerControl: {fileID: 7762382288669782229, guid: e23ffed24187b164c92a99cdae535fc6,
+  PlayerControl: {fileID: 5302761309571650152, guid: 03d4dde9ddbd074429210f07cedc564a,
     type: 3}
-  PlayerAI: {fileID: 7990184232535431716, guid: cf8cf0ee0152e9e4881019b3bcf25877,
+  PlayerAI: {fileID: 5302761309571650152, guid: 03d4dde9ddbd074429210f07cedc564a,
     type: 3}
   BotAI: {fileID: 690913016725035377, guid: 15daa3b03ad5c694c972c0af7eefd0a3, type: 3}
 --- !u!1 &1380395943
