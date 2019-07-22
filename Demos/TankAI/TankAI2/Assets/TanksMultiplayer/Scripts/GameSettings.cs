@@ -38,7 +38,8 @@ namespace TanksMP
         }
 
         public GameObject GetPlayerController() {
-            return PlayerAI;
+            return PlayerControl;
+            //return PlayerAI;
         }
 
         public GameObject GetBotController() {

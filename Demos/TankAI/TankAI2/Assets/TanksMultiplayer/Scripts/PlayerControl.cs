@@ -43,15 +43,21 @@ namespace TanksMP
                 tankPlayer.SimpleMove(moveDir);
             }
 
-            //cast a ray on a plane at the mouse position for detecting where to shoot 
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
-            Plane plane = new Plane(Vector3.up, Vector3.up);
-            float distance = 0f;
+            ////cast a ray on a plane at the mouse position for detecting where to shoot 
+            //Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            //Plane plane = new Plane(Vector3.up, Vector3.up);
+            //float distance = 0f;
             Vector3 hitPos = Vector3.zero;
-            //the hit position determines the mouse position in the scene
-            if (plane.Raycast(ray, out distance))
+            ////the hit position determines the mouse position in the scene
+            //if (plane.Raycast(ray, out distance))
+            //{
+            //    hitPos = ray.GetPoint(distance) - tankPlayer.transform.position;
+            //}
+
+            if (Input.GetAxisRaw("HorizontalR") != 0 || Input.GetAxisRaw("VerticalR") != 0)
             {
-                hitPos = ray.GetPoint(distance) - tankPlayer.transform.position;
+                hitPos.x = Input.GetAxis("HorizontalR");
+                hitPos.z = -Input.GetAxis("VerticalR");
             }
 
             //we've converted the mouse position to a direction
