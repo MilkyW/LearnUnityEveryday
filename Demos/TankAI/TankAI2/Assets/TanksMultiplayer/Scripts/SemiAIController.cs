@@ -109,9 +109,10 @@ namespace TanksMP
 
         private Vector3 SimpleRotate()
         {
-            LayerMask layerMask = LayerMask.GetMask("Powerup");
-            const float height = 0.4f;
-            tankPlayer.GetComponent<Collider>().enabled = false;
+            LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
+            float height = tankPlayer.shotPos.position.y;
+            //float radius = GameObject.FindGameObjectWithTag("Bullet").GetComponentInParent<SphereCollider>().radius;
+            float radius = 0.2f;
             GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
             RaycastHit raycastHit;
             float minDistance = float.MaxValue;
@@ -121,22 +122,23 @@ namespace TanksMP
             Vector3 turnDir = Vector2.zero;
             foreach (var pl in allplayer)
             {
+                pl.GetComponent<Collider>().enabled = false;
                 var comp = pl.GetComponent<BasePlayer>();
                 Vector3 target = comp.Position;
                 target.y = height;
                 Debug.DrawLine(origin, target, Color.blue);
                 if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive
                     && (target - origin).magnitude < minDistance
-                        && Physics.Raycast(origin, target - origin, out raycastHit, (target - origin).magnitude + 1.0f, ~layerMask)
-                        && raycastHit.collider.gameObject.CompareTag("Player"))
+                        && Physics.SphereCast(target, radius, origin - target, out raycastHit, (origin - target).magnitude + 1.0f, ~layerMask)
+                        && raycastHit.collider.gameObject == tankPlayer.gameObject)
                 {
                     minDistance = (target - origin).magnitude;
-                    hitPos = raycastHit.collider.transform.position;
+                    hitPos = target;
                 }
+                pl.GetComponent<Collider>().enabled = true;
             }
             if (minDistance != float.MaxValue)
             {
-                hitPos.y = height;
                 Debug.DrawLine(origin, hitPos, Color.red);
                 hitPos -= origin;
 
@@ -147,7 +149,6 @@ namespace TanksMP
                 tankPlayer.RotateTurret(hitPos.x, hitPos.z);
             }
 
-            tankPlayer.GetComponent<Collider>().enabled = true;
             return turnDir;
         }
 
