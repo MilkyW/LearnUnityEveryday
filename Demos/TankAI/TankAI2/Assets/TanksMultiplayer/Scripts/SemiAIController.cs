@@ -12,6 +12,10 @@ namespace TanksMP
         private int lastScore = 0;
         private const float bulletSpeed = 18.0f;
         private const float tankSpeed = 8.0f;
+        private Vector3 lastTarget;
+        private Vector3 currentTarget;
+
+        private Vector3[] lastPosition = new Vector3[4];
 
         protected override void OnInit()
         {
@@ -25,6 +29,7 @@ namespace TanksMP
             GameManager.GetInstance().ui.controls[1].onDrag += RotateTurret;
             GameManager.GetInstance().ui.controls[1].onDrag += Shoot;
 #endif
+            Invoke("DrawTrailsInit", 2.0f);
         }
 
         protected override void OnFixedUpdate()
@@ -50,6 +55,7 @@ namespace TanksMP
                 tankPlayer.Shoot();
                 shootTime++;
                 hitRate = ((float)hitTime) / shootTime;
+                lastTarget = currentTarget;
             }
 
             if (GameManager.GetInstance().GetScore(tankPlayer.teamIndex) != lastScore)
@@ -151,7 +157,7 @@ namespace TanksMP
                 Debug.DrawLine(origin, target, Color.blue);
                 if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive
                     && (target - origin).magnitude < minDistance
-                        && Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude + 1.0f, ~layerMask)
+                        && Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
                         && raycastHit.collider.gameObject == tankPlayer.gameObject)
                 {
                     minDistance = (target - origin).magnitude;
@@ -198,7 +204,7 @@ namespace TanksMP
                 Debug.DrawLine(origin, target, Color.blue);
                 if (comp.owner.GetComponent<BasePlayer>().teamIndex != tankPlayer.teamIndex
                     && (target - origin).magnitude < minDistance
-                        && Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude + 1.0f, ~layerMask)
+                        && Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
                         && raycastHit.collider.gameObject == tankPlayer.gameObject)
                 {
                     Vector3 delta = origin - target;
@@ -251,12 +257,11 @@ namespace TanksMP
                 var comp = pl.GetComponent<BasePlayer>();
                 //Vector3 target = comp.Position;
                 Vector3 target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
+
                 target += comp.Velocity * Time.fixedDeltaTime;
                 target.y = height;
                 if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive
-                    && (target - origin).magnitude < minDistance
-                        && Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude + 1.0f, ~layerMask)
-                        && raycastHit.collider.gameObject == tankPlayer.gameObject)
+                    && (target - origin).magnitude < minDistance)
                 {
                     Vector3 delta = origin - target;
                     float theta = Vector3.Angle(delta, comp.Velocity) * Mathf.Deg2Rad;
@@ -266,47 +271,39 @@ namespace TanksMP
                     Quaternion direction = Quaternion.LookRotation(-delta, Vector3.up)
                         * Quaternion.AngleAxis(alpha * Mathf.Rad2Deg, Vector3.up);
 
-                    hitPos = target + comp.Velocity * time;
-                    minDistance = (hitPos - origin).magnitude;
-                    Debug.DrawLine(origin, hitPos, Color.cyan);
+                    target += comp.Velocity * time;
+                    float distance = (target - origin).magnitude;
 
-                    //Vector3 project = Vector3.Project(delta, comp.Velocity);
-                    //Vector3 normal = delta - project;
-                    //Debug.DrawLine(target, target + project, Color.green);
-                    //Debug.DrawLine(origin, origin - normal, Color.yellow);
-                    //float timeB = normal.magnitude / bulletSpeed;
-                    //float timeT = project.magnitude / tankSpeed;
+                    if (distance < minDistance
+                       && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit,
+                       distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2, ~layerMask)
+                       || raycastHit.collider.gameObject == tankPlayer.gameObject))
+                    {
+                        //Debug.DrawRay(target, (origin - target).normalized * (distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2), Color.black);
+                        minDistance = distance;
+                        hitPos = target;
+                        //Debug.DrawLine(origin, hitPos, Color.red);
+                    }
 
-                    //if (timeB < timeT)
-                    //{
-                    //    minDistance = (target - origin).magnitude;
-                    //    hitPos = target;
-                    //}
-
-                    //else
-                    //{
-                    //    target += project;
-                    //    float distance = (target - origin).magnitude;
-
-                    //    if (distance < minDistance
-                    //        && !Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, distance, ~layerMask))
-                    //    {
-                    //        minDistance = distance;
-                    //        hitPos = target;
-                    //    }
-                    //    else
-                    //    {
-                    //        target -= project;
-                    //        minDistance = (target - origin).magnitude;
-                    //        hitPos = target;
-                    //    }
-                    //}
+                    else
+                    {
+                        target -= comp.Velocity * time;
+                        if (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
+                        || raycastHit.collider.gameObject == tankPlayer.gameObject)
+                        {
+                            //Debug.DrawRay(target, origin - target, Color.white);
+                            minDistance = (target - origin).magnitude;
+                            hitPos = target;
+                            //Debug.DrawLine(origin, hitPos, Color.blue);
+                        }
+                    }
                 }
                 pl.GetComponent<Collider>().enabled = true;
             }
             if (minDistance != ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed)
             {
                 Debug.DrawLine(origin, hitPos, Color.red);
+                currentTarget = hitPos;
                 hitPos -= origin;
 
                 //we've converted the mouse position to a direction
@@ -317,6 +314,53 @@ namespace TanksMP
             }
 
             return turnDir;
+        }
+
+        private void OnDrawGizmos()
+        {
+            Gizmos.DrawWireSphere(lastTarget, 0.5f);
+        }
+
+        private void DrawTrailsInit()
+        {
+            GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
+            foreach (var pl in allplayer)
+            {
+                var comp = pl.GetComponent<BasePlayer>();
+                lastPosition[comp.teamIndex] = comp.Position;
+            }
+            InvokeRepeating("DrawTrails", Time.fixedDeltaTime, Time.fixedDeltaTime);
+        }
+
+        private void DrawTrails()
+        {
+            GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
+            foreach (var pl in allplayer)
+            {
+                var comp = pl.GetComponent<BasePlayer>();
+                int index = comp.teamIndex;
+                if (comp.IsAlive)
+                {
+                    Color color = Color.white;
+                    switch (index)
+                    {
+                        case 0:
+                            color = Color.red;
+                            break;
+                        case 1:
+                            color = Color.cyan;
+                            break;
+                        case 2:
+                            color = Color.green;
+                            break;
+                        case 3:
+                            color = Color.yellow;
+                            break;
+                    }
+                    Debug.DrawLine(lastPosition[index], comp.Position, color, 1.0f);
+                }
+                lastPosition[index] = comp.Position;
+            }
         }
 
         protected override void OnStop()
