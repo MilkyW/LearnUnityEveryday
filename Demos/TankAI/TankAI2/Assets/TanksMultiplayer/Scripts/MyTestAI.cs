@@ -38,7 +38,6 @@ namespace TanksMP
         }
 
         BasePlayer lockPlayer;
-        //GameObject lockPowerUp;
     }
 
 }

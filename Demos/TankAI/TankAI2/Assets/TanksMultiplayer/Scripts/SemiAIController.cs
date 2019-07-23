@@ -291,18 +291,18 @@ namespace TanksMP
                         //Debug.DrawLine(origin, hitPos, Color.red);
                     }
 
-                    else
-                    {
-                        target -= comp.Velocity * time;
-                        if (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
-                        || raycastHit.collider.gameObject == tankPlayer.gameObject)
-                        {
-                            //Debug.DrawRay(target, origin - target, Color.white);
-                            minDistance = (target - origin).magnitude;
-                            hitPos = target;
-                            //Debug.DrawLine(origin, hitPos, Color.blue);
-                        }
-                    }
+                    //else
+                    //{
+                    //    target -= comp.Velocity * time;
+                    //    if (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
+                    //    || raycastHit.collider.gameObject == tankPlayer.gameObject)
+                    //    {
+                    //        //Debug.DrawRay(target, origin - target, Color.white);
+                    //        minDistance = (target - origin).magnitude;
+                    //        hitPos = target;
+                    //        //Debug.DrawLine(origin, hitPos, Color.blue);
+                    //    }
+                    //}
                 }
                 pl.GetComponent<Collider>().enabled = true;
             }
