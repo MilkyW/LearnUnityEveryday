@@ -10,6 +10,8 @@ namespace TanksMP
         public int hitTime = 0;
         public float hitRate = 0;
         private int lastScore = 0;
+        private const float bulletSpeed = 18.0f;
+        private const float tankSpeed = 8.0f;
 
         protected override void OnInit()
         {
@@ -38,8 +40,9 @@ namespace TanksMP
             moveDir = MoveJoystick();
             //turnDir = RotateMouse();
             //turnDir = RotateJoystick();
-            turnDir = SimpleRotate();
+            //turnDir = SimpleRotate();
             //turnDir = ExpectBulletRotate();
+            turnDir = ExpectTankRotate();
 
             //shoot bullet on left mouse click
             if (tankPlayer.bShootable && (turnDir != Vector2.zero || Input.GetButton("Fire1")))
@@ -132,7 +135,7 @@ namespace TanksMP
             float bulletRadius = 0.2f;
             GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
             RaycastHit raycastHit;
-            float minDistance = ((tankPlayer.currentBullet == 2) ? 3 : 1) * 18.0f;
+            float minDistance = ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed;
             Vector3 origin = tankPlayer.Position;
             origin.y = height;
             Vector3 hitPos = Vector3.zero;
@@ -156,7 +159,7 @@ namespace TanksMP
                 }
                 pl.GetComponent<Collider>().enabled = true;
             }
-            if (minDistance != ((tankPlayer.currentBullet == 2) ? 3 : 1) * 18.0f)
+            if (minDistance != ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed)
             {
                 Debug.DrawLine(origin, hitPos, Color.red);
                 hitPos -= origin;
@@ -179,7 +182,7 @@ namespace TanksMP
             float bulletRadius = 0.2f;
             GameObject[] allbullet = GameObject.FindGameObjectsWithTag("Bullet");
             RaycastHit raycastHit;
-            float minDistance = ((tankPlayer.currentBullet == 2) ? 3 : 1) * 18.0f;
+            float minDistance = ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed;
             Vector3 origin = tankPlayer.Position;
             origin.y = height;
             Vector3 hitPos = Vector3.zero;
@@ -214,7 +217,7 @@ namespace TanksMP
                 }
                 bl.GetComponent<Collider>().enabled = true;
             }
-            if (minDistance != ((tankPlayer.currentBullet == 2) ? 3 : 1) * 18.0f)
+            if (minDistance != ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed)
             {
                 Debug.DrawLine(origin, hitPos, Color.red);
                 hitPos -= origin;
@@ -237,7 +240,7 @@ namespace TanksMP
             float bulletRadius = 0.2f;
             GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
             RaycastHit raycastHit;
-            float minDistance = ((tankPlayer.currentBullet == 2) ? 3 : 1) * 18.0f;
+            float minDistance = ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed;
             Vector3 origin = tankPlayer.Position;
             origin.y = height;
             Vector3 hitPos = Vector3.zero;
@@ -250,28 +253,58 @@ namespace TanksMP
                 Vector3 target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
                 target += comp.Velocity * Time.fixedDeltaTime;
                 target.y = height;
-                Debug.DrawLine(origin, target, Color.blue);
                 if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive
                     && (target - origin).magnitude < minDistance
                         && Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude + 1.0f, ~layerMask)
                         && raycastHit.collider.gameObject == tankPlayer.gameObject)
                 {
                     Vector3 delta = origin - target;
-                    Vector3 project = Vector3.Project(comp.Velocity, delta);
-                    Vector3 reflect = Vector3.Reflect(comp.Velocity, -project.normalized);
-                    float distance = delta.magnitude / project.magnitude * reflect.magnitude;
-                    target = origin + reflect;
+                    float theta = Vector3.Angle(delta, comp.Velocity) * Mathf.Deg2Rad;
+                    float alpha = Mathf.Asin(tankSpeed / bulletSpeed * Mathf.Sin(theta));
+                    float time = Mathf.Sin(alpha) * delta.magnitude
+                        / Mathf.Sin(Mathf.PI - alpha - theta) / tankSpeed;
+                    Quaternion direction = Quaternion.LookRotation(-delta, Vector3.up)
+                        * Quaternion.AngleAxis(alpha * Mathf.Rad2Deg, Vector3.up);
 
-                    if (distance < minDistance
-                        && !Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, distance, ~layerMask))
-                    {
-                        minDistance = distance;
-                        hitPos = target;
-                    }
+                    hitPos = target + comp.Velocity * time;
+                    minDistance = (hitPos - origin).magnitude;
+                    Debug.DrawLine(origin, hitPos, Color.cyan);
+
+                    //Vector3 project = Vector3.Project(delta, comp.Velocity);
+                    //Vector3 normal = delta - project;
+                    //Debug.DrawLine(target, target + project, Color.green);
+                    //Debug.DrawLine(origin, origin - normal, Color.yellow);
+                    //float timeB = normal.magnitude / bulletSpeed;
+                    //float timeT = project.magnitude / tankSpeed;
+
+                    //if (timeB < timeT)
+                    //{
+                    //    minDistance = (target - origin).magnitude;
+                    //    hitPos = target;
+                    //}
+
+                    //else
+                    //{
+                    //    target += project;
+                    //    float distance = (target - origin).magnitude;
+
+                    //    if (distance < minDistance
+                    //        && !Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, distance, ~layerMask))
+                    //    {
+                    //        minDistance = distance;
+                    //        hitPos = target;
+                    //    }
+                    //    else
+                    //    {
+                    //        target -= project;
+                    //        minDistance = (target - origin).magnitude;
+                    //        hitPos = target;
+                    //    }
+                    //}
                 }
                 pl.GetComponent<Collider>().enabled = true;
             }
-            if (minDistance != ((tankPlayer.currentBullet == 2) ? 3 : 1) * 18.0f)
+            if (minDistance != ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed)
             {
                 Debug.DrawLine(origin, hitPos, Color.red);
                 hitPos -= origin;
