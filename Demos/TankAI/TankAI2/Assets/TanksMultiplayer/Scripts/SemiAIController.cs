@@ -6,6 +6,11 @@ namespace TanksMP
 {
     public class SemiAIController : BaseControl
     {
+        public int shootTime = 0;
+        public int hitTime = 0;
+        public float hitRate = 0;
+        private int lastScore = 0;
+
         protected override void OnInit()
         {
             base.OnInit();
@@ -36,8 +41,19 @@ namespace TanksMP
             turnDir = SimpleRotate();
 
             //shoot bullet on left mouse click
-            if (turnDir != Vector2.zero || Input.GetButton("Fire1"))
+            if (tankPlayer.bShootable && (turnDir != Vector2.zero || Input.GetButton("Fire1")))
+            {
                 tankPlayer.Shoot();
+                shootTime++;
+                hitRate = ((float)hitTime) / shootTime;
+            }
+
+            if (GameManager.GetInstance().GetScore(tankPlayer.teamIndex) != lastScore)
+            {
+                lastScore = GameManager.GetInstance().GetScore(tankPlayer.teamIndex);
+                hitTime++;
+                hitRate = ((float)hitTime) / shootTime;
+            }
 
             //replicate input to mobile controls for illustration purposes
 #if UNITY_EDITOR
@@ -112,7 +128,7 @@ namespace TanksMP
             LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
             float height = tankPlayer.shotPos.position.y;
             //float radius = GameObject.FindGameObjectWithTag("Bullet").GetComponentInParent<SphereCollider>().radius;
-            float radius = 0.2f;
+            float bulletRadius = 0.2f;
             GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
             RaycastHit raycastHit;
             float minDistance = float.MaxValue;
@@ -129,7 +145,7 @@ namespace TanksMP
                 Debug.DrawLine(origin, target, Color.blue);
                 if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive
                     && (target - origin).magnitude < minDistance
-                        && Physics.SphereCast(target, radius, origin - target, out raycastHit, (origin - target).magnitude + 1.0f, ~layerMask)
+                        && Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude + 1.0f, ~layerMask)
                         && raycastHit.collider.gameObject == tankPlayer.gameObject)
                 {
                     minDistance = (target - origin).magnitude;
