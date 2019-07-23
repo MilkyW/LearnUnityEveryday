@@ -38,8 +38,8 @@ namespace TanksMP
             moveDir = MoveJoystick();
             //turnDir = RotateMouse();
             //turnDir = RotateJoystick();
-            //turnDir = SimpleRotate();
-            turnDir = ExpectBulletRotate();
+            turnDir = SimpleRotate();
+            //turnDir = ExpectBulletRotate();
 
             //shoot bullet on left mouse click
             if (tankPlayer.bShootable && (turnDir != Vector2.zero || Input.GetButton("Fire1")))
@@ -246,8 +246,9 @@ namespace TanksMP
             {
                 pl.GetComponent<Collider>().enabled = false;
                 var comp = pl.GetComponent<BasePlayer>();
-                Vector3 target = comp.Position;
-                target += comp.GetComponent<SphereCollider>().center;
+                //Vector3 target = comp.Position;
+                Vector3 target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
+                target += comp.Velocity * Time.fixedDeltaTime;
                 target.y = height;
                 Debug.DrawLine(origin, target, Color.blue);
                 if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive
