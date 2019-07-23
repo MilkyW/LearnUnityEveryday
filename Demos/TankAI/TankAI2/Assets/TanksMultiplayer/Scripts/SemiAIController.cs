@@ -42,12 +42,22 @@ namespace TanksMP
             Vector2 turnDir = Vector2.zero;
 #pragma warning restore 0219
 
-            moveDir = MoveJoystick();
+            if (MoveJoystick(ref moveDir))
+            {
+                tankPlayer.SimpleMove(moveDir);
+            }
             //turnDir = RotateMouse();
             //turnDir = RotateJoystick();
             //turnDir = SimpleRotate();
             //turnDir = ExpectBulletRotate();
-            turnDir = ExpectTankRotate();
+            if (RotateJoystick(ref turnDir))
+            {
+                tankPlayer.RotateTurret(turnDir.x, turnDir.y);
+            }
+            else if (ExpectTankRotate(ref turnDir))
+            {
+                tankPlayer.RotateTurret(turnDir.x, turnDir.y);
+            }
 
             //shoot bullet on left mouse click
             if (tankPlayer.bShootable && (turnDir != Vector2.zero || Input.GetButton("Fire1")))
@@ -72,24 +82,21 @@ namespace TanksMP
 #endif
         }
 
-        private Vector3 MoveJoystick()
+        private bool MoveJoystick(ref Vector2 moveDir)
         {
-            Vector2 moveDir = Vector2.zero;
 
             //reset moving input when no arrow keys are pressed down
             if (Input.GetAxisRaw("Horizontal") == 0 && Input.GetAxisRaw("Vertical") == 0)
             {
-                //MoveEnd();
+                return false;
             }
             else
             {
                 //read out moving directions and calculate force
                 moveDir.x = Input.GetAxis("Horizontal");
                 moveDir.y = Input.GetAxis("Vertical");
-                tankPlayer.SimpleMove(moveDir);
+                return true;
             }
-
-            return moveDir;
         }
 
         private Vector3 RotateMouse()
@@ -114,7 +121,7 @@ namespace TanksMP
             return turnDir;
         }
 
-        private Vector3 RotateJoystick()
+        private bool RotateJoystick(ref Vector2 turnDir)
         {
             Vector3 hitPos = Vector3.zero;
 
@@ -122,15 +129,17 @@ namespace TanksMP
             {
                 hitPos.x = Input.GetAxis("HorizontalR");
                 hitPos.z = -Input.GetAxis("VerticalR");
+
+                //we've converted the mouse position to a direction
+                turnDir = new Vector2(hitPos.x, hitPos.z);
+
+                //rotate turret to look at the mouse direction
+                tankPlayer.RotateTurret(hitPos.x, hitPos.z);
+
+                return true;
             }
 
-            //we've converted the mouse position to a direction
-            Vector3 turnDir = new Vector2(hitPos.x, hitPos.z);
-
-            //rotate turret to look at the mouse direction
-            tankPlayer.RotateTurret(hitPos.x, hitPos.z);
-
-            return turnDir;
+            return false;
         }
 
         private Vector3 SimpleRotate()
@@ -180,7 +189,7 @@ namespace TanksMP
             return turnDir;
         }
 
-        private Vector3 ExpectBulletRotate()
+        private bool ExpectBulletRotate(ref Vector2 turnDir)
         {
             LayerMask layerMask = LayerMask.GetMask("Powerup");
             float height = tankPlayer.shotPos.position.y;
@@ -192,7 +201,6 @@ namespace TanksMP
             Vector3 origin = tankPlayer.Position;
             origin.y = height;
             Vector3 hitPos = Vector3.zero;
-            Vector3 turnDir = Vector2.zero;
             foreach (var bl in allbullet)
             {
                 bl.GetComponent<Collider>().enabled = false;
@@ -231,14 +239,13 @@ namespace TanksMP
                 //we've converted the mouse position to a direction
                 turnDir = new Vector2(hitPos.x, hitPos.z);
 
-                //rotate turret to look at the mouse direction
-                tankPlayer.RotateTurret(hitPos.x, hitPos.z);
+                return true;
             }
 
-            return turnDir;
+            return false;
         }
 
-        private Vector3 ExpectTankRotate()
+        private bool ExpectTankRotate(ref Vector2 turnDir)
         {
             LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
             float height = tankPlayer.shotPos.position.y;
@@ -250,7 +257,6 @@ namespace TanksMP
             Vector3 origin = tankPlayer.Position;
             origin.y = height;
             Vector3 hitPos = Vector3.zero;
-            Vector3 turnDir = Vector2.zero;
             foreach (var pl in allplayer)
             {
                 pl.GetComponent<Collider>().enabled = false;
@@ -309,11 +315,10 @@ namespace TanksMP
                 //we've converted the mouse position to a direction
                 turnDir = new Vector2(hitPos.x, hitPos.z);
 
-                //rotate turret to look at the mouse direction
-                tankPlayer.RotateTurret(hitPos.x, hitPos.z);
+                return true;
             }
 
-            return turnDir;
+            return false;
         }
 
         private void OnDrawGizmos()
