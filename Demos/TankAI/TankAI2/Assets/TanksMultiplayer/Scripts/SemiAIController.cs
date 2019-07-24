@@ -150,6 +150,8 @@ namespace TanksMP
             bool doShoot = false;
 #pragma warning restore 0219
 
+            //Debug.Log(agent.path.corners.Length.ToString());
+
             if (MoveJoystick(ref moveDir))
             {
                 startAutoTime = Time.time + Time.fixedDeltaTime;
@@ -515,7 +517,7 @@ namespace TanksMP
             LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
             float height = tankPlayer.shotPos.position.y;
             //float radius = GameObject.FindGameObjectWithTag("Bullet").GetComponentInParent<SphereCollider>().radius;
-            float bulletRadius = 0.23f;
+            float bulletRadius = 0.25f;
             GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
             RaycastHit raycastHit;
             Vector3 shootDelta = tankPlayer.shotPos.position - tankPlayer.Position;
@@ -523,7 +525,7 @@ namespace TanksMP
             float shootMore = shootDelta.magnitude;
             float minDistance = ((tankPlayer.currentBullet == 2) ? 3.0f : 1.0f) * bulletSpeed + shootMore;
             float minDistanceB = minDistance;
-            float minDistanceW = minDistance;
+            float minDistanceW = minDistance / 2.0f;
             Vector3 origin = tankPlayer.Position;
             origin += tankPlayer.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
             origin.y = height;
@@ -549,39 +551,42 @@ namespace TanksMP
                     float timing = (target - origin).magnitude / bulletSpeed;
                     bool isOut = false;
 
-                    for (int i = 0; i < iterations; i++)
+                    if (!ag.isStopped)
                     {
-                        if (AtPos(timing, ref positions, ref timings, out target))
+                        for (int i = 0; i < iterations; i++)
                         {
-                            timing = (target - origin).magnitude / bulletSpeed;
-                            //Debug.Log(timing.ToString());
+                            if (AtPos(timing, ref positions, ref timings, out target))
+                            {
+                                timing = (target - origin).magnitude / bulletSpeed;
+                                //Debug.Log(timing.ToString());
+                            }
+                            else
+                            {
+                                isOut = true;
+                                break;
+                            }
                         }
-                        else
-                        {
-                            isOut = true;
-                            break;
-                        }
-                    }
 
-                    if (!isOut)
-                    {
+                        if (!isOut)
+                        {
 #if UNITY_EDITOR
-                        Debug.DrawRay(target, origin - target, Color.black);
+                            Debug.DrawRay(target, origin - target, Color.black);
 #endif
-                        if ((target - origin).magnitude < minDistanceB
-                         && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
-                     || raycastHit.collider.gameObject == tankPlayer.gameObject))
-                        {
-                            minDistanceB = (target - origin).magnitude;
-                            hitPos = target;
-                            found = true;
-                            foundB = true;
-                            lastTargetPlayer = comp;
-                            //Debug.DrawLine(origin, hitPos, Color.blue);
+                            if ((target - origin).magnitude < minDistanceB
+                             && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
+                         || raycastHit.collider.gameObject == tankPlayer.gameObject))
+                            {
+                                minDistanceB = (target - origin).magnitude;
+                                hitPos = target;
+                                found = true;
+                                foundB = true;
+                                lastTargetPlayer = comp;
+                                //Debug.DrawLine(origin, hitPos, Color.blue);
+                            }
                         }
                     }
 
-                    else if (!foundB)
+                    if (!foundB)
                     {
                         target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
                         //Vector3 compVelocity = comp.Velocity;
@@ -638,6 +643,9 @@ namespace TanksMP
                 float shootMore = shootDelta.magnitude;
                 Gizmos.DrawWireSphere(tankPlayer.Position,
                     ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed + shootMore);
+                Gizmos.color = Color.white;
+                Gizmos.DrawWireSphere(tankPlayer.Position,
+                    (((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed + shootMore)/2.0f);
             }
 
             for (int i = 0; i < agents.Length; i++)

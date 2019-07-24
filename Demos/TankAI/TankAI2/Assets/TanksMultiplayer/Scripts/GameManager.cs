@@ -19,10 +19,10 @@ namespace TanksMP
     /// It manages functions such as team fill, scores and ending a game, but also video ad results.
     /// </summary>
 	public class GameManager : NetworkBehaviour
-    {   
+    {
         //reference to this script instance
         private static GameManager instance;
-        
+
         /// <summary>
         /// The local player instance spawned for this client.
         /// </summary>
@@ -38,7 +38,7 @@ namespace TanksMP
         /// Reference to the UI script displaying game stats.
         /// </summary>
         public UIGame ui;
-        
+
         /// <summary>
         /// Definition of playing teams with additional properties.
         /// </summary>
@@ -97,11 +97,11 @@ namespace TanksMP
             gameTime = 300;
 
             //if Unity Ads is enabled, hook up its result callback
-            #if UNITY_ADS
+#if UNITY_ADS
                 UnityAdsManager.adResultEvent += HandleAdResult;
-            #endif
+#endif
         }
-        
+
 
         /// <summary>
         /// Returns a reference to this script instance.
@@ -116,20 +116,23 @@ namespace TanksMP
         /// Global check whether this client is the match master or not.
         /// </summary>
 		public static bool isMaster()
-		{
-			return GetInstance().isServer;
-		}
+        {
+            if (GetInstance() == null)
+                return false;
+
+            return GetInstance().isServer;
+        }
 
         public int GetScore(int teamId)
         {
             return teamId >= score.Count ? 0 : score[teamId];
-        } 
+        }
 
         public float GetTimeLeft()
         {
             return gameTime;
         }
-        
+
         /// <summary>
         /// Server only: initialize SyncList length with team size once.
         /// Also verifies the team fill for each team in case of host migration.
@@ -137,9 +140,9 @@ namespace TanksMP
         public override void OnStartServer()
         {
             //should execute only on the initial master
-            if(size.Count != teams.Length)
+            if (size.Count != teams.Length)
             {
-                for(int i = 0; i < teams.Length; i++)
+                for (int i = 0; i < teams.Length; i++)
                 {
                     size.Add(0);
                     score.Add(0);
@@ -149,48 +152,48 @@ namespace TanksMP
                     names.Add("Bot");
                 }
             }
-                       
+
             //update team fill in UI
             StartCoroutine(OnHostMigration());
             StartCoroutine(RespawnCoroutine());
         }
-        
+
         //called for the first host and new host after migration, if any
         IEnumerator OnHostMigration()
         {
             //wait for the next frame because UNET needs time to initialize
             //not doing this could prevent a successful host migration execution
             yield return new WaitForEndOfFrame();
-            
+
             //workaround for old host not decreasing its team size on game quit for itself
             //there is no way to get the old server player object in the migration manager,
             //so we'll have to compare the current active players to detect the team mismatch.
             //maybe some previous clients did not make the switch to the new host either and
             //accidentally disconnected too, which makes this good practice to update the UI
             int[] tempSize = new int[teams.Length];
-            foreach(NetworkConnection conn in NetworkServer.connections)
+            foreach (NetworkConnection conn in NetworkServer.connections)
             {
                 if (conn.clientOwnedObjects == null)
                     continue;
 
                 //loop over each connection and get the controlling player object for it
-                foreach(NetworkInstanceId netId in conn.clientOwnedObjects)
+                foreach (NetworkInstanceId netId in conn.clientOwnedObjects)
                 {
                     GameObject obj = NetworkServer.FindLocalObject(netId);
-                    if(obj == null) continue;
-                    
+                    if (obj == null) continue;
+
                     BasePlayer netPlayer = obj.GetComponent<BasePlayer>();
-                    if(netPlayer == null) continue;
-                    
+                    if (netPlayer == null) continue;
+
                     //with the Player found get its team index and increase its team fill
                     tempSize[netPlayer.teamIndex]++;
                 }
             }
-            
+
             //loop over team fill and update SyncList and UI with new values, where necessary
-            for(int i = 0; i < tempSize.Length; i++)
-            {                
-                if(size[i] != tempSize[i])
+            for (int i = 0; i < tempSize.Length; i++)
+            {
+                if (size[i] != tempSize[i])
                 {
                     size[i] = tempSize[i];
                     ui.OnTeamSizeChanged(SyncListInt.Operation.OP_DIRTY, i);
@@ -204,10 +207,10 @@ namespace TanksMP
         /// update the game UI, i.e. team fill and scores, by looping over the received SyncLists.
         /// </summary>
         public override void OnStartClient()
-        {        
+        {
             //double check whether the game joined is still running, otherwise return to the menu scene
             //this could happen when a connection has been made right before the game ended and stopped
-            if(IsGameOver())
+            if (IsGameOver())
             {
                 ui.Quit();
                 return;
@@ -221,7 +224,7 @@ namespace TanksMP
             collects.Callback = OnCollectibleStateChanged;
             //call the hooks manually for the first time, for each team
             for (int i = 0; i < teams.Length; i++) ui.OnTeamSizeChanged(SyncListInt.Operation.OP_DIRTY, i);
-            for(int i = 0; i < teams.Length; i++) ui.OnTeamScoreChanged(SyncListInt.Operation.OP_DIRTY, i);
+            for (int i = 0; i < teams.Length; i++) ui.OnTeamScoreChanged(SyncListInt.Operation.OP_DIRTY, i);
             for (int i = 0; i < teams.Length; i++) ui.OnTeamNameChanged(SyncListString.Operation.OP_DIRTY, i);
         }
 
@@ -245,22 +248,22 @@ namespace TanksMP
 
             int min = size[0];
             //loop over teams to find the lowest fill
-            for(int i = 0; i < teams.Length; i++)
+            for (int i = 0; i < teams.Length; i++)
             {
                 //if fill is lower than the previous value
                 //store new fill and team for next iteration
-                if(size[i] < min)
+                if (size[i] < min)
                 {
                     min = size[i];
                     teamNo = i;
                 }
             }
-            
+
             //return index of lowest team
             return teamNo;
         }
-        
-        
+
+
         /// <summary>
         /// Returns a random spawn position within the team's spawn area.
         /// </summary>
@@ -270,13 +273,13 @@ namespace TanksMP
             Vector3 pos = teams[teamIndex].spawn.position;
             BoxCollider col = teams[teamIndex].spawn.GetComponent<BoxCollider>();
 
-            if(col != null)
+            if (col != null)
             {
                 //find a position within the box collider range, first set fixed y position
                 //the counter determines how often we are calculating a new position if out of range
                 pos.y = col.transform.position.y;
                 int counter = 10;
-                
+
                 //try to get random position within collider bounds
                 //if it's not within bounds, do another iteration
                 do
@@ -285,15 +288,15 @@ namespace TanksMP
                     pos.z = UnityEngine.Random.Range(col.bounds.min.z, col.bounds.max.z);
                     counter--;
                 }
-                while(!col.bounds.Contains(pos) && counter > 0);
+                while (!col.bounds.Contains(pos) && counter > 0);
             }
-            
+
             return pos;
         }
 
 
         //implements what to do when an ad view completes
-        #if UNITY_ADS
+#if UNITY_ADS
         void HandleAdResult(ShowResult result)
         {
             switch (result)
@@ -313,9 +316,9 @@ namespace TanksMP
                     break;
             }
         }
-        #endif
+#endif
 
-        
+
         /// <summary>
         /// Adds points to the target team depending on matching game mode and score type.
         /// This allows us for granting different amount of points on different score actions.
@@ -323,11 +326,11 @@ namespace TanksMP
         public void AddScore(ScoreType scoreType, int teamIndex)
         {
             //distinguish between game mode
-            switch(gameMode)
+            switch (gameMode)
             {
                 //in TDM, we only grant points for killing
                 case GameMode.TDM:
-                    switch(scoreType)
+                    switch (scoreType)
                     {
                         case ScoreType.Kill:
                             score[teamIndex] += 3;
@@ -345,11 +348,11 @@ namespace TanksMP
                             ItemCount[teamIndex] += 1;
                             break;
                     }
-                break;
+                    break;
 
                 //in CTF, we grant points for both killing and flag capture
                 case GameMode.CTF:
-                    switch(scoreType)
+                    switch (scoreType)
                     {
                         case ScoreType.Kill:
                             score[teamIndex] += 1;
@@ -359,7 +362,7 @@ namespace TanksMP
                             score[teamIndex] += 10;
                             break;
                     }
-                break;
+                    break;
             }
 
             ui.OnTeamScoreChanged(SyncList<int>.Operation.OP_DIRTY, teamIndex);
@@ -375,9 +378,9 @@ namespace TanksMP
         {
             //find existing index, if any
             int index = collects.Count;
-            for(int i = 0; i < collects.Count; i++)
+            for (int i = 0; i < collects.Count; i++)
             {
-                if(collects[i].objId == id)
+                if (collects[i].objId == id)
                 {
                     index = i;
                     break;
@@ -418,7 +421,7 @@ namespace TanksMP
 
             //get Collectible component on that object
             Collectible colComp = obj.GetComponent<Collectible>();
-            if(colComp == null) return;
+            if (colComp == null) return;
 
             //targetId is assigned: handle pickup on the corresponding player
             //or position is not at origin: handle drop at that position
@@ -437,7 +440,7 @@ namespace TanksMP
             return gameTime <= 0;
             ////init variables
             //bool isOver = false;
-            
+
             ////loop over teams to find the highest score
             //for(int i = 0; i < teams.Length; i++)
             //{
@@ -449,12 +452,12 @@ namespace TanksMP
             //        break;
             //    }
             //}
-            
+
             ////return the result
             //return isOver;
         }
-        
-        
+
+
         /// <summary>
         /// Only for this player: sets the death text stating the killer on death.
         /// If Unity Ads is enabled, tries to show an ad during the respawn delay.
@@ -465,7 +468,7 @@ namespace TanksMP
             //get the player component that killed us
             BasePlayer other = localPlayer;
             string killedByName = "YOURSELF";
-            if(localPlayer.killedBy != null)
+            if (localPlayer.killedBy != null)
                 other = localPlayer.killedBy.GetComponent<BasePlayer>();
 
             //suicide or regular kill?
@@ -478,72 +481,72 @@ namespace TanksMP
             }
 
             //calculate if we should show a video ad
-            #if UNITY_ADS
+#if UNITY_ADS
             if (!skipAd && UnityAdsManager.ShowAd())
                 return;
-            #endif
+#endif
 
             //when no ad is being shown, set the death text
             //and start waiting for the respawn delay immediately
             ui.SetDeathText(killedByName, teams[other.teamIndex]);
             StartCoroutine(SpawnRoutine());
         }
-        
-        
+
+
         //TODO: move display to Rpc
         //coroutine spawning the player after a respawn delay
         IEnumerator SpawnRoutine()
         {
             //calculate point in time for respawn
             float targetTime = Time.time + respawnTime;
-           
+
             //wait for the respawn to be over,
             //while waiting update the respawn countdown
-            while(targetTime - Time.time > 0)
+            while (targetTime - Time.time > 0)
             {
                 ui.SetSpawnDelay(targetTime - Time.time);
                 yield return null;
             }
-            
+
             //respawn now: send request to the server
             ui.DisableDeath();
         }
         //TODO: end
-        
+
         /// <summary>
         /// Only for this player: sets game over text stating the winning team.
         /// Disables player movement so no updates are sent through the network.
         /// </summary>
         public void DisplayGameOver(int teamIndex)
-        {           
+        {
             localPlayer.enabled = false;
             localPlayer.camFollow.HideMask(true);
             ui.SetGameOverText(teams[teamIndex]);
-            
+
             //starts coroutine for displaying the game over window
             StartCoroutine(DisplayGameOver());
         }
-        
-        
+
+
         //displays game over window after short delay
         IEnumerator DisplayGameOver()
         {
             //give the user a chance to read which team won the game
             //before enabling the game over screen
             yield return new WaitForSeconds(3);
-            
+
             //show game over window and disconnect from network
             ui.ShowGameOver();
             NetworkManager.singleton.StopHost();
         }
-        
-        
+
+
         //clean up callbacks on scene switches
         void OnDestroy()
         {
-            #if UNITY_ADS
+#if UNITY_ADS
                 UnityAdsManager.adResultEvent -= HandleAdResult;
-            #endif
+#endif
         }
 
         private void Update()
@@ -594,9 +597,10 @@ namespace TanksMP
             while (true)
             {
                 float t = Time.time;
-                
-                toRevive.RemoveAll(It => {
-                    if(It.Time <= t)
+
+                toRevive.RemoveAll(It =>
+                {
+                    if (It.Time <= t)
                     {
                         // do revive;
                         It.Player.RpcRespawn();
@@ -606,30 +610,30 @@ namespace TanksMP
                     {
                         return false;
                     }
-                } );
+                });
 
                 yield return 0;
             }
         }
     }
 
-    
+
     /// <summary>
     /// Defines properties of a team.
     /// </summary>
-     [System.Serializable]
+    [System.Serializable]
     public class Team
     {
         /// <summary>
         /// The name of the team shown on game over.
         /// </summary>
         public string name;
-             
+
         /// <summary>
         /// The color of a team for UI and player prefabs.
         /// </summary>   
         public Material material;
-            
+
         /// <summary>
         /// The spawn point of a team in the scene. In case it has a BoxCollider
         /// component attached, a point within the collider bounds will be used.

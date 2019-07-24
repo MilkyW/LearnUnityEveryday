@@ -13,13 +13,13 @@ namespace TanksMP
         }
 
 
-        private void OnDestroy()
-        {
-            if(instance == this)
-            {
-                instance = null;
-            }
-        }
+        //private void OnDestroy()
+        //{
+        //    if(instance == this)
+        //    {
+        //        instance = null;
+        //    }
+        //}
 
         public GameObject PlayerControl;
         public GameObject PlayerAI;
