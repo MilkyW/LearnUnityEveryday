@@ -418,7 +418,7 @@ namespace TanksMP
                 if (agents[i] != null && agents[i].enabled)
                 {
                     Gizmos.color = getTeamColor(i);
-                    Gizmos.DrawWireCube(agents[i].nextPosition, new Vector3(0.5f, 0.5f, 0.5f));
+                    Gizmos.DrawWireCube(agents[i].destination, new Vector3(0.5f, 0.5f, 0.5f));
                 }
             }
 
