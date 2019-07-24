@@ -484,17 +484,41 @@ namespace TanksMP
                         }
                     }
 
-#if UNITY_EDITOR
-                    Debug.DrawRay(target, origin - target, Color.black);
-#endif
-                    if (!isOut && (target - origin).magnitude < minDistance
-                        && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
-                    || raycastHit.collider.gameObject == tankPlayer.gameObject))
+                    if (!isOut)
                     {
-                        minDistance = (target - origin).magnitude;
-                        hitPos = target;
-                        found = true;
-                        //Debug.DrawLine(origin, hitPos, Color.blue);
+#if UNITY_EDITOR
+                        Debug.DrawRay(target, origin - target, Color.black);
+#endif
+                        if ((target - origin).magnitude < minDistance
+                         && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
+                     || raycastHit.collider.gameObject == tankPlayer.gameObject))
+                        {
+                            minDistance = (target - origin).magnitude;
+                            hitPos = target;
+                            found = true;
+                            //Debug.DrawLine(origin, hitPos, Color.blue);
+                        }
+                    }
+
+                    else
+                    {
+                        target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
+                        //Vector3 compVelocity = comp.Velocity;
+                        Vector3 compVelocity = comp.GetComponent<NavMeshAgent>().velocity;
+                        target += compVelocity * Time.fixedDeltaTime;
+                        target.y = height;
+#if UNITY_EDITOR
+                        Debug.DrawRay(target, origin - target, Color.white);
+#endif
+                        if ((target - origin).magnitude < minDistance
+                            && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
+                            || raycastHit.collider.gameObject == tankPlayer.gameObject))
+                        {
+                            minDistance = (target - origin).magnitude;
+                            hitPos = target;
+                            found = true;
+                            //Debug.DrawLine(origin, hitPos, Color.blue);
+                        }
                     }
 
                     lastPosition[comp.teamIndex] = comp.Position;
