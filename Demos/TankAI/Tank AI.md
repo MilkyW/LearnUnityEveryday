@@ -82,7 +82,13 @@
 
 ### 避枪
 
-预判：插值AABB检测
+预判：插值AABB检测，动作别扭，计时器，无路可逃
+
+NavMesh Level：Static 不支持
+
+NavMeshObstacle curve：会影响其他人
+
+自己写A*导航：规则不允许
 
 ### 对枪
 

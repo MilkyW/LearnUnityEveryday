@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
 
 namespace TanksMP
 {
@@ -24,11 +25,25 @@ namespace TanksMP
         private Vector3[] lastAimPosition = new Vector3[4];
         private Vector3[] lastPosition = new Vector3[4];
 
+        private NavMeshAgent[] agents = new NavMeshAgent[4];
+        private NavMeshAgent agent;
+
         private void InitStatistics()
         {
             statistics.shootTime = 0;
             statistics.hitTime = 0;
             statistics.hitRate = 0;
+        }
+
+        private void InitEnemy()
+        {
+            GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
+            foreach (var pl in allplayer)
+            {
+                var comp = pl.GetComponent<BasePlayer>();
+                int index = comp.teamIndex;
+                agents[index] = pl.GetComponent<NavMeshAgent>();
+            }
         }
 
         protected override void OnInit()
@@ -48,6 +63,10 @@ namespace TanksMP
             InitStatistics();
             Invoke("DrawTrailsInit", 2.0f);
 #endif
+
+            Invoke("InitEnemy", 2.0f);
+            agent = tankPlayer.GetComponent<NavMeshAgent>();
+            agent.autoBraking = false;
         }
 
         protected override void OnFixedUpdate()
@@ -281,6 +300,7 @@ namespace TanksMP
             float shootMore = shootDelta.magnitude;
             float minDistance = ((tankPlayer.currentBullet == 2) ? 3.0f : 1.0f) * bulletSpeed + shootMore;
             Vector3 origin = tankPlayer.Position;
+            origin += tankPlayer.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
             origin.y = height;
             Vector3 hitPos = Vector3.zero;
             bool found = false;
@@ -292,6 +312,10 @@ namespace TanksMP
                     pl.GetComponent<Collider>().enabled = false;
                     //Vector3 target = comp.Position;
                     Vector3 target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
+                    //Vector3 compVelocity = comp.Velocity;
+                    Vector3 compVelocity = comp.GetComponent<NavMeshAgent>().velocity;
+                    target += compVelocity * Time.fixedDeltaTime;
+                    target.y = height;
 
                     if ((lastPosition[comp.teamIndex] - comp.Position).magnitude < tankSpeed * Time.fixedDeltaTime / 2)
                     {
@@ -311,13 +335,9 @@ namespace TanksMP
 
                     else
                     {
-                        Vector3 compVelocity = comp.Velocity;
-                        compVelocity.y = 0;
 #if UNITY_EDITOR
                         Debug.DrawLine(target, target + compVelocity * 0.5f, getTeamColor(comp.teamIndex), Time.fixedDeltaTime);
 #endif
-                        target += compVelocity * Time.fixedDeltaTime;
-                        target.y = height;
                         if ((target - origin).magnitude < minDistance)
                         {
                             Vector3 delta = origin - target;
@@ -382,6 +402,7 @@ namespace TanksMP
 
         private void OnDrawGizmos()
         {
+            Gizmos.color = getTeamColor(tankPlayer.teamIndex);
             Gizmos.DrawWireSphere(lastTarget, 0.5f);
             if (tankPlayer.bShootable)
             {
@@ -390,6 +411,20 @@ namespace TanksMP
                 float shootMore = shootDelta.magnitude;
                 Gizmos.DrawWireSphere(tankPlayer.Position,
                     ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed + shootMore);
+            }
+
+            for (int i = 0; i < agents.Length; i++)
+            {
+                if (agents[i] != null && agents[i].enabled)
+                {
+                    Gizmos.color = getTeamColor(i);
+                    Gizmos.DrawWireCube(agents[i].nextPosition, new Vector3(0.5f, 0.5f, 0.5f));
+                }
+            }
+
+            foreach (var ag in agents)
+            {
+
             }
         }
 
