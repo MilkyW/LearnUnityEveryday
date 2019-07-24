@@ -28,6 +28,8 @@ namespace TanksMP
         private NavMeshAgent[] agents = new NavMeshAgent[4];
         private NavMeshAgent agent;
 
+        private float startAutoTime = 0;
+
         private void InitStatistics()
         {
             statistics.shootTime = 0;
@@ -82,10 +84,13 @@ namespace TanksMP
 
             if (MoveJoystick(ref moveDir))
             {
+                startAutoTime = Time.time + Time.fixedDeltaTime;
+                agent.isStopped = true;
                 tankPlayer.SimpleMove(moveDir);
             }
-            else
+            else if (startAutoTime < Time.time)
             {
+                agent.isStopped = false;
                 tankPlayer.MoveTo(new Vector3(0, 0, 0));
             }
             //turnDir = RotateMouse();
@@ -447,11 +452,15 @@ namespace TanksMP
             shootDelta.y = 0;
             float shootMore = shootDelta.magnitude;
             float minDistance = ((tankPlayer.currentBullet == 2) ? 3.0f : 1.0f) * bulletSpeed + shootMore;
+            float minDistanceB = minDistance;
+            float minDistanceW = minDistance;
             Vector3 origin = tankPlayer.Position;
             origin += tankPlayer.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
             origin.y = height;
             Vector3 hitPos = Vector3.zero;
             bool found = false;
+            bool foundB = false;
+            bool foundW = false;
             foreach (var pl in allplayer)
             {
                 var comp = pl.GetComponent<BasePlayer>();
@@ -475,7 +484,7 @@ namespace TanksMP
                         if (AtPos(timing, ref positions, ref timings, out target))
                         {
                             timing = (target - origin).magnitude / bulletSpeed;
-                            Debug.Log(timing.ToString());
+                            //Debug.Log(timing.ToString());
                         }
                         else
                         {
@@ -489,18 +498,19 @@ namespace TanksMP
 #if UNITY_EDITOR
                         Debug.DrawRay(target, origin - target, Color.black);
 #endif
-                        if ((target - origin).magnitude < minDistance
+                        if ((target - origin).magnitude < minDistanceB
                          && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
                      || raycastHit.collider.gameObject == tankPlayer.gameObject))
                         {
-                            minDistance = (target - origin).magnitude;
+                            minDistanceB = (target - origin).magnitude;
                             hitPos = target;
                             found = true;
+                            foundB = true;
                             //Debug.DrawLine(origin, hitPos, Color.blue);
                         }
                     }
 
-                    else
+                    else if (!foundB)
                     {
                         target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
                         //Vector3 compVelocity = comp.Velocity;
@@ -510,13 +520,14 @@ namespace TanksMP
 #if UNITY_EDITOR
                         Debug.DrawRay(target, origin - target, Color.white);
 #endif
-                        if ((target - origin).magnitude < minDistance
+                        if ((target - origin).magnitude < minDistanceW
                             && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
                             || raycastHit.collider.gameObject == tankPlayer.gameObject))
                         {
-                            minDistance = (target - origin).magnitude;
+                            minDistanceW = (target - origin).magnitude;
                             hitPos = target;
                             found = true;
+                            foundW = true;
                             //Debug.DrawLine(origin, hitPos, Color.blue);
                         }
                     }
