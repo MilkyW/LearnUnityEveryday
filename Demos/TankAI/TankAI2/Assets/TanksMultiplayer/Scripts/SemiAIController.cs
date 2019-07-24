@@ -6,9 +6,15 @@ namespace TanksMP
 {
     public class SemiAIController : BaseControl
     {
-        public int shootTime = 0;
-        public int hitTime = 0;
-        public float hitRate = 0;
+        [System.Serializable]
+        public struct Statistics
+        {
+            public int shootTime;
+            public int hitTime;
+            public float hitRate;
+        }
+        public Statistics statistics;
+
         private int lastScore = 0;
         private const float bulletSpeed = 18.0f;
         private const float tankSpeed = 8.0f;
@@ -17,6 +23,13 @@ namespace TanksMP
 
         private Vector3[] lastAimPosition = new Vector3[4];
         private Vector3[] lastPosition = new Vector3[4];
+
+        private void InitStatistics()
+        {
+            statistics.shootTime = 0;
+            statistics.hitTime = 0;
+            statistics.hitRate = 0;
+        }
 
         protected override void OnInit()
         {
@@ -30,7 +43,11 @@ namespace TanksMP
             GameManager.GetInstance().ui.controls[1].onDrag += RotateTurret;
             GameManager.GetInstance().ui.controls[1].onDrag += Shoot;
 #endif
+
+#if UNITY_EDITOR
+            InitStatistics();
             Invoke("DrawTrailsInit", 2.0f);
+#endif
         }
 
         protected override void OnFixedUpdate()
@@ -65,16 +82,20 @@ namespace TanksMP
             if (tankPlayer.bShootable && (doShoot || Input.GetButton("Fire1")))
             {
                 tankPlayer.Shoot();
-                shootTime++;
-                hitRate = ((float)hitTime) / shootTime;
+#if UNITY_EDITOR
+                statistics.shootTime++;
+                statistics.hitRate = ((float)statistics.hitTime) / statistics.shootTime;
+#endif
                 lastTarget = currentTarget;
             }
 
             if (GameManager.GetInstance().GetScore(tankPlayer.teamIndex) != lastScore)
             {
                 lastScore = GameManager.GetInstance().GetScore(tankPlayer.teamIndex);
-                hitTime++;
-                hitRate = ((float)hitTime) / shootTime;
+#if UNITY_EDITOR
+                statistics.hitTime++;
+                statistics.hitRate = ((float)statistics.hitTime) / statistics.shootTime;
+#endif
             }
 
             //replicate input to mobile controls for illustration purposes
@@ -252,7 +273,7 @@ namespace TanksMP
             LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
             float height = tankPlayer.shotPos.position.y;
             //float radius = GameObject.FindGameObjectWithTag("Bullet").GetComponentInParent<SphereCollider>().radius;
-            float bulletRadius = 0.2f;
+            float bulletRadius = 0.21f;
             GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
             RaycastHit raycastHit;
             Vector3 shootDelta = tankPlayer.shotPos.position - tankPlayer.Position;
@@ -272,13 +293,15 @@ namespace TanksMP
                     //Vector3 target = comp.Position;
                     Vector3 target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
 
-                    if (lastPosition[comp.teamIndex] == comp.Position)
+                    if ((lastPosition[comp.teamIndex] - comp.Position).magnitude < tankSpeed * Time.fixedDeltaTime / 2)
                     {
+#if UNITY_EDITOR
                         Debug.DrawRay(target, origin - target, Color.white);
+#endif
                         if ((target - origin).magnitude < minDistance
                             && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
                         || raycastHit.collider.gameObject == tankPlayer.gameObject))
-                        {                            
+                        {
                             minDistance = (target - origin).magnitude;
                             hitPos = target;
                             found = true;
@@ -290,7 +313,9 @@ namespace TanksMP
                     {
                         Vector3 compVelocity = comp.Velocity;
                         compVelocity.y = 0;
+#if UNITY_EDITOR
                         Debug.DrawLine(target, target + compVelocity * 0.5f, getTeamColor(comp.teamIndex), Time.fixedDeltaTime);
+#endif
                         target += compVelocity * Time.fixedDeltaTime;
                         target.y = height;
                         if ((target - origin).magnitude < minDistance)
@@ -305,14 +330,14 @@ namespace TanksMP
 
                             target += compVelocity * time;
                             float distance = (target - origin).magnitude;
-
+#if UNITY_EDITOR
                             Debug.DrawRay(target, (origin - target).normalized * (distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2), Color.black);
-
+#endif
                             if (distance < minDistance
                                && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit,
                                distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2, ~layerMask)
                                || raycastHit.collider.gameObject == tankPlayer.gameObject))
-                            {                                
+                            {
                                 minDistance = distance;
                                 hitPos = target;
                                 found = true;
@@ -340,7 +365,9 @@ namespace TanksMP
             }
             if (found)
             {
+#if UNITY_EDITOR
                 Debug.DrawLine(origin, hitPos, Color.magenta);
+#endif
                 currentTarget = hitPos;
                 hitPos -= origin;
 
@@ -350,6 +377,8 @@ namespace TanksMP
 
             return found;
         }
+
+#if UNITY_EDITOR
 
         private void OnDrawGizmos()
         {
@@ -411,6 +440,8 @@ namespace TanksMP
                 lastAimPosition[index] = comp.Position;
             }
         }
+
+#endif
 
         protected override void OnStop()
         {
