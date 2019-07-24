@@ -30,6 +30,10 @@ namespace TanksMP
 
         private float startAutoTime = 0;
 
+        //movement variables
+        private Vector2 moveDir = Vector2.zero;
+        private Vector2 turnDir = Vector2.zero;
+
         [System.Serializable]
         public class BulletInfo
         {
@@ -144,9 +148,6 @@ namespace TanksMP
             UpdateBulletInfo();
 
 #pragma warning disable 0219
-            //movement variables
-            Vector2 moveDir = Vector2.zero;
-            Vector2 turnDir = Vector2.zero;
             bool doShoot = false;
 #pragma warning restore 0219
 
@@ -512,6 +513,30 @@ namespace TanksMP
             return true;
         }
 
+        private Vector3 MyNextPos()
+        {
+            Vector3 origin = tankPlayer.Position;
+            if (agent.isStopped)
+            {
+                LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
+                RaycastHit raycastHit;
+                if (Physics.Raycast(origin, moveDir, out raycastHit, tankSpeed * Time.fixedDeltaTime, layerMask))
+                {
+                    origin = raycastHit.point;
+                    origin.x -= moveDir.normalized.x * (transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).z / 2);
+                    origin.z -= moveDir.normalized.y * (transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).z / 2);
+                }
+            }
+            else
+            {
+                Vector3[] positions;
+                float[] timings;
+                PredictPathInit(origin, agent.path.corners, out positions, out timings);
+                AtPos(Time.fixedDeltaTime, ref positions, ref timings, out origin);
+            }
+            return origin;
+        }
+
         private bool SeeTankRotate(ref Vector2 turnDir)
         {
             LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
@@ -522,19 +547,21 @@ namespace TanksMP
             RaycastHit raycastHit;
             Vector3 shootDelta = tankPlayer.shotPos.position - tankPlayer.Position;
             shootDelta.y = 0;
+            Vector3 myNextPos = MyNextPos();
             float shootMore = shootDelta.magnitude;
             float minDistance = ((tankPlayer.currentBullet == 2) ? 3.0f : 1.0f) * bulletSpeed + shootMore;
             float minDistanceB = minDistance;
             float minDistanceW = minDistance / 2.0f;
-            Vector3 origin = tankPlayer.Position;
-            origin += tankPlayer.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
-            origin.y = height;
+            //Vector3 origin = tankPlayer.Position;
+            //origin += tankPlayer.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
+            //origin.y = height;
             Vector3 hitPos = Vector3.zero;
             bool found = false;
             bool foundB = false;
             bool foundW = false;
             foreach (var pl in allplayer)
             {
+                Vector3 origin = myNextPos;
                 var comp = pl.GetComponent<BasePlayer>();
                 if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive && !WillDie(comp))
                 {
@@ -557,6 +584,7 @@ namespace TanksMP
                         {
                             if (AtPos(timing, ref positions, ref timings, out target))
                             {
+                                origin = myNextPos + (target - origin).normalized * shootMore;
                                 timing = (target - origin).magnitude / bulletSpeed;
                                 //Debug.Log(timing.ToString());
                             }
@@ -593,6 +621,7 @@ namespace TanksMP
                         Vector3 compVelocity = comp.GetComponent<NavMeshAgent>().velocity;
                         target += compVelocity * Time.fixedDeltaTime;
                         target.y = height;
+                        origin = myNextPos + (target - origin).normalized * shootMore;
 #if UNITY_EDITOR
                         Debug.DrawRay(target, origin - target, Color.white);
 #endif
@@ -615,6 +644,7 @@ namespace TanksMP
             }
             if (found)
             {
+                Vector3 origin = myNextPos + (hitPos - myNextPos).normalized * shootMore;
 #if UNITY_EDITOR
                 Debug.DrawLine(origin, hitPos, Color.magenta);
 #endif
@@ -645,7 +675,7 @@ namespace TanksMP
                     ((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed + shootMore);
                 Gizmos.color = Color.white;
                 Gizmos.DrawWireSphere(tankPlayer.Position,
-                    (((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed + shootMore)/2.0f);
+                    (((tankPlayer.currentBullet == 2) ? 3 : 1) * bulletSpeed + shootMore) / 2.0f);
             }
 
             for (int i = 0; i < agents.Length; i++)
