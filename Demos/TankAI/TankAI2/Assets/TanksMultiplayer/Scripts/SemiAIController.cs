@@ -84,6 +84,10 @@ namespace TanksMP
             {
                 tankPlayer.SimpleMove(moveDir);
             }
+            else
+            {
+                tankPlayer.MoveTo(new Vector3(0, 0, 0));
+            }
             //turnDir = RotateMouse();
             //turnDir = RotateJoystick();
             //turnDir = SimpleRotate();
@@ -92,7 +96,8 @@ namespace TanksMP
             {
                 tankPlayer.RotateTurret(turnDir.x, turnDir.y);
             }
-            else if (doShoot = ExpectTankRotate(ref turnDir))
+            //else if (doShoot = ExpectTankRotate(ref turnDir))
+            else if (doShoot = SeeTankRotate(ref turnDir))
             {
                 tankPlayer.RotateTurret(turnDir.x, turnDir.y);
             }
@@ -377,6 +382,119 @@ namespace TanksMP
                             //    }
                             //}
                         }
+                    }
+
+                    lastPosition[comp.teamIndex] = comp.Position;
+                    pl.GetComponent<Collider>().enabled = true;
+                }
+            }
+            if (found)
+            {
+#if UNITY_EDITOR
+                Debug.DrawLine(origin, hitPos, Color.magenta);
+#endif
+                currentTarget = hitPos;
+                hitPos -= origin;
+
+                //we've converted the mouse position to a direction
+                turnDir = new Vector2(hitPos.x, hitPos.z);
+            }
+
+            return found;
+        }
+
+        private void PredictPathInit(Vector3 currentPos, Vector3[] corners, out Vector3[] pos, out float[] timings)
+        {
+            pos = new Vector3[corners.Length + 1];
+            timings = new float[pos.Length];
+            pos[0] = currentPos;
+            timings[0] = 0;
+            for (int i = 1; i < pos.Length; i++)
+            {
+                pos[i] = corners[i - 1];
+                timings[i] = timings[i - 1] + (pos[i] - pos[i - 1]).magnitude / tankSpeed;
+            }
+        }
+
+        private bool AtPos(float timing, ref Vector3[] pos, ref float[] timings, out Vector3 at)
+        {
+            at = Vector3.zero;
+            if (timing < 0 || timing > timings[timings.Length - 1])
+                return false;
+
+            for (int i = 1; i < timings.Length; i++)
+            {
+                if (timing < timings[i])
+                {
+                    at = Vector3.Lerp(pos[i - 1], pos[i], (timing - timings[i - 1]) / (timings[i] - timings[i - 1]));
+                    return true;
+                }
+            }
+
+            Debug.Assert(false);
+            return true;
+        }
+
+        private bool SeeTankRotate(ref Vector2 turnDir)
+        {
+            LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
+            float height = tankPlayer.shotPos.position.y;
+            //float radius = GameObject.FindGameObjectWithTag("Bullet").GetComponentInParent<SphereCollider>().radius;
+            float bulletRadius = 0.23f;
+            GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
+            RaycastHit raycastHit;
+            Vector3 shootDelta = tankPlayer.shotPos.position - tankPlayer.Position;
+            shootDelta.y = 0;
+            float shootMore = shootDelta.magnitude;
+            float minDistance = ((tankPlayer.currentBullet == 2) ? 3.0f : 1.0f) * bulletSpeed + shootMore;
+            Vector3 origin = tankPlayer.Position;
+            origin += tankPlayer.GetComponent<NavMeshAgent>().velocity * Time.fixedDeltaTime;
+            origin.y = height;
+            Vector3 hitPos = Vector3.zero;
+            bool found = false;
+            foreach (var pl in allplayer)
+            {
+                var comp = pl.GetComponent<BasePlayer>();
+                if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive)
+                {
+                    pl.GetComponent<Collider>().enabled = false;
+                    Vector3 target = comp.Position;
+                    target.y = height;
+
+                    NavMeshAgent ag = comp.GetComponent<NavMeshAgent>();
+                    Vector3[] positions;
+                    float[] timings;
+                    PredictPathInit(target, ag.path.corners, out positions, out timings);
+
+                    int iterations = 5;
+                    float timing = (target - origin).magnitude / bulletSpeed;
+                    bool isOut = false;
+
+                    for (int i = 0; i < iterations; i++)
+                    {
+                        if (AtPos(timing, ref positions, ref timings, out target))
+                        {
+                            timing = (target - origin).magnitude / bulletSpeed;
+                            Debug.Log(timing.ToString());
+                        }
+                        else
+                        {
+                            isOut = true;
+                            break;
+                        }
+                    }
+
+#if UNITY_EDITOR
+                    Debug.DrawRay(target, origin - target, Color.black);
+#endif
+                    if (!isOut && (target - origin).magnitude < minDistance
+                        && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
+                    || raycastHit.collider.gameObject == tankPlayer.gameObject))
+                    {
+                        minDistance = (target - origin).magnitude;
+                        hitPos = target;
+                        found = true;
+                        //Debug.DrawLine(origin, hitPos, Color.blue);
                     }
 
                     lastPosition[comp.teamIndex] = comp.Position;
