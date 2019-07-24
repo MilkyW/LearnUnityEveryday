@@ -99,6 +99,8 @@ ObjectSpawner：respawnTime、nextSpawn
 
 存在必中收割子弹
 
+简化：存在我的收割子弹
+
 #### 细节
 
 子弹留存时间

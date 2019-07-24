@@ -30,6 +30,16 @@ namespace TanksMP
 
         private float startAutoTime = 0;
 
+        [System.Serializable]
+        public class BulletInfo
+        {
+            public BasePlayer target;
+            public bool inited;
+            public bool found;
+        }
+        public Dictionary<Bullet, BulletInfo> bulletInfos = new Dictionary<Bullet, BulletInfo>();
+        public BasePlayer lastTargetPlayer;
+
         private void InitStatistics()
         {
             statistics.shootTime = 0;
@@ -46,6 +56,63 @@ namespace TanksMP
                 int index = comp.teamIndex;
                 agents[index] = pl.GetComponent<NavMeshAgent>();
             }
+        }
+
+        private void UpdateBulletInfo()
+        {
+            GameObject[] allbullet = GameObject.FindGameObjectsWithTag("Bullet");
+            foreach (var bis in bulletInfos)
+            {
+                bis.Value.found = false;
+            }
+            foreach (var bl in allbullet)
+            {
+                Bullet bullet = bl.GetComponent<Bullet>();
+                if (bulletInfos.ContainsKey(bullet))
+                {
+                    var bi = bulletInfos[bullet];
+                    if (!bi.inited && bullet.owner == tankPlayer.gameObject)
+                    {
+                        bi.target = lastTargetPlayer;
+                        bi.inited = true;
+                    }
+                    bi.found = true;
+                }
+                else
+                {
+                    BulletInfo bi = new BulletInfo();
+                    bulletInfos.Add(bullet, bi);
+                    if (bullet.owner == tankPlayer.gameObject)
+                    {
+                        bi.target = lastTargetPlayer;
+                        bi.inited = true;
+                    }
+                    bi.found = true;
+                }
+            }
+            foreach (var bis in bulletInfos)
+            {
+                if (bis.Value.found == false)
+                {
+                    bis.Value.inited = false;
+                }
+            }
+        }
+
+        private bool WillDie(BasePlayer target)
+        {
+            if (target.health > 5)
+                return false;
+
+            foreach(var bis in bulletInfos)
+            {
+                if (bis.Key.enabled && bis.Value.inited && bis.Value.target == target
+                    && target.health < bis.Key.damage + 1)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         protected override void OnInit()
@@ -74,6 +141,7 @@ namespace TanksMP
         protected override void OnFixedUpdate()
         {
             base.OnFixedUpdate();
+            UpdateBulletInfo();
 
 #pragma warning disable 0219
             //movement variables
@@ -464,7 +532,7 @@ namespace TanksMP
             foreach (var pl in allplayer)
             {
                 var comp = pl.GetComponent<BasePlayer>();
-                if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive)
+                if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive && !WillDie(comp))
                 {
                     pl.GetComponent<Collider>().enabled = false;
                     Vector3 target = comp.Position;
@@ -506,6 +574,7 @@ namespace TanksMP
                             hitPos = target;
                             found = true;
                             foundB = true;
+                            lastTargetPlayer = comp;
                             //Debug.DrawLine(origin, hitPos, Color.blue);
                         }
                     }
@@ -528,6 +597,7 @@ namespace TanksMP
                             hitPos = target;
                             found = true;
                             foundW = true;
+                            lastTargetPlayer = comp;
                             //Debug.DrawLine(origin, hitPos, Color.blue);
                         }
                     }
