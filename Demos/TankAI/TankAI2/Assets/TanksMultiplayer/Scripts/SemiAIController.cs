@@ -104,7 +104,7 @@ namespace TanksMP
             if (target.health > 5)
                 return false;
 
-            foreach(var bis in bulletInfos)
+            foreach (var bis in bulletInfos)
             {
                 if (bis.Key.enabled && bis.Value.inited && bis.Value.target == target
                     && target.health < bis.Key.damage + 1)
@@ -160,6 +160,8 @@ namespace TanksMP
             {
                 agent.isStopped = false;
                 tankPlayer.MoveTo(new Vector3(0, 0, 0));
+                //if (agent.path.corners.Length > 1)
+                //    moveDir = agent.path.corners[1] - tankPlayer.Position;
             }
             //turnDir = RotateMouse();
             //turnDir = RotateJoystick();
@@ -620,6 +622,8 @@ namespace TanksMP
 
             return found;
         }
+
+
 
 #if UNITY_EDITOR
 
