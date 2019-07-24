@@ -421,7 +421,7 @@ namespace TanksMP
                     //Debug.Log(agents[i].path.corners.Length.ToString());
                     foreach (Vector3 pos in agents[i].path.corners)
                     {
-                        Gizmos.DrawWireCube(pos, new Vector3(3f, 3f, 3f));
+                        Gizmos.DrawWireCube(pos, new Vector3(0.5f, 0.5f, 0.5f));
                     }
                     Gizmos.DrawWireCube(agents[i].destination, new Vector3(1f, 1f, 1f));
                 }
