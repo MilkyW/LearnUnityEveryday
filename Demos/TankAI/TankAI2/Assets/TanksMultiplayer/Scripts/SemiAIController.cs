@@ -873,11 +873,11 @@ namespace TanksMP
 #if UNITY_EDITOR
                         Debug.DrawRay(target, origin - target, Color.white);
 #endif
-                        if ((target - origin).magnitude < minDistanceW
+                        if ((target - origin).magnitude < minDistanceB
                             && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit, (origin - target).magnitude, ~layerMask)
                         || raycastHit.collider.gameObject == tankPlayer.gameObject))
                         {
-                            minDistanceW = (target - origin).magnitude;
+                            minDistanceB = (target - origin).magnitude;
                             hitPos = target;
                             foundW = true;
                             //Debug.DrawLine(origin, hitPos, Color.blue);
