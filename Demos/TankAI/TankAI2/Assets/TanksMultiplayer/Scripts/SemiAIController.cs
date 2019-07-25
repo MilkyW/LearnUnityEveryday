@@ -34,6 +34,7 @@ namespace TanksMP
         private Vector2 moveDir = Vector2.zero;
         private Vector2 turnDir = Vector2.zero;
         private float lazy = 0;
+        GameObject toAvoid = null;
 
         private bool startPhase = true;
 
@@ -60,6 +61,8 @@ namespace TanksMP
         [System.Serializable]
         public class EnemyInfo
         {
+            public int ammo;
+            public int hitPoints;
             public bool willDie;
             public bool found;
         }
@@ -394,7 +397,7 @@ namespace TanksMP
 
         private void MoveWhere(ref Vector2 moveDir)
         {
-            if (Time.time > lazy)
+            if (Time.time > lazy || !toAvoid || !toAvoid.activeInHierarchy)
             {
                 Vector3 tankPosition = tankPlayer.Position;
                 tankPosition.y = 0;
@@ -485,7 +488,7 @@ namespace TanksMP
                 {
                     minShieldTimeCost *= 1.0f * ((float)tankPlayer.health / tankPlayer.maxHealth);
                     minBulletTimeCost *= 1.3f;
-                    minHealthTimeCost *= 1.5f * ((float)tankPlayer.health / tankPlayer.maxHealth);
+                    minHealthTimeCost *= 1.7f * ((float)tankPlayer.health / tankPlayer.maxHealth);
                     if (minShieldTimeCost < minBulletTimeCost && minShieldTimeCost < minHealthTimeCost)
                     {
                         minCost = minShieldTimeCost;
@@ -503,11 +506,14 @@ namespace TanksMP
                     }
                 }
 
+                bool foundHorror = false;
+
                 GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
                 foreach (var pl in allplayer)
                 {
                     BasePlayer player = pl.GetComponent<BasePlayer>();
-                    if (player.teamIndex != tankPlayer.teamIndex && player.IsAlive)
+                    if (player.teamIndex != tankPlayer.teamIndex && player.IsAlive
+                        && (!enemyInfos.ContainsKey(player) || !enemyInfos[player].willDie))
                     {
                         Vector3 plPosition = player.Position;
                         plPosition.y = 0;
@@ -574,6 +580,12 @@ namespace TanksMP
                             }
                         }
 
+                        else if (timeCost < 0.41f)
+                        {
+                            toAvoid = player.gameObject;
+                            foundHorror = true;
+                        }
+
                     }
                 }
 
@@ -588,10 +600,9 @@ namespace TanksMP
                 tankPosition.y = height;
                 Vector3 tankVelocity = tankPlayer.Velocity;
                 tankVelocity.y = 0;
-                float minAvoidTime = 0.41f;
+                float minAvoidTime = 0.21f;
                 float minReachTime = 3;
                 float minDistance = (arguments.tankWidth * 0.5f + arguments.bulletRadius + 0.1f);
-                Bullet bl = null;
 
                 foreach (var bis in bulletInfos)
                 {
@@ -617,10 +628,17 @@ namespace TanksMP
                         {
                             if ((tankP - bulletPosition).magnitude < minDistance)
                             {
-                                if (i < minAvoidTime)
-                                    break;
-                                bl = bis.Key;
-                                minReachTime = i;
+                                if (i > minAvoidTime)
+                                {
+                                    toAvoid = bis.Key.gameObject;
+                                    minReachTime = i;
+                                    foundHorror = true;
+                                }
+                                //else
+                                //{
+                                //    toAvoid = bis.Key.owner;
+                                //}
+                                break;
                             }
                             tankP += tankVelocity * Time.fixedDeltaTime;
                             bulletPosition += bulletVelocity * Time.fixedDeltaTime;
@@ -628,42 +646,57 @@ namespace TanksMP
                     }
                 }
 
-                if (bl != null)
+                if (foundHorror)
                 {
-                    lazy = Time.time + minReachTime;
-                    agent.isStopped = true;
-                    Vector3 blPosition = bl.transform.position;
-                    blPosition.y = 0;
-                    tankPlayer.transform.LookAt(blPosition);
-                    tankPlayer.transform.Rotate(new Vector3(0, 90, 0));
-                    Vector3 delta0 = Vector3.zero;
-                    Vector3 delta1 = Vector3.zero;
+                    if (toAvoid.GetComponent<Bullet>())
+                    {
+                        lazy = Time.time + minReachTime;
+                        agent.isStopped = true;
+                        Vector3 horror = toAvoid.transform.position;
+                        horror.y = 0;
+                        tankPlayer.transform.LookAt(horror);
+                        tankPlayer.transform.Rotate(new Vector3(0, 90, 0));
+                        Vector3 delta0 = Vector3.zero;
+                        Vector3 delta1 = Vector3.zero;
 
-                    tankPlayer.GetComponent<Collider>().enabled = false;
-                    if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
-                         out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
-                    {
-                        delta0 = tankPosition - raycastHit.point;
-                        delta0.y = 0;
-                    }
-                    tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
-                    if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
-                        out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
-                    {
-                        delta1 = tankPosition - raycastHit.point;
-                        delta1.y = 0;
-                    }
-                    tankPlayer.GetComponent<Collider>().enabled = true;
-
-                    if (delta0.magnitude < delta1.magnitude)
-                    {
+                        tankPlayer.GetComponent<Collider>().enabled = false;
+                        if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
+                             out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
+                        {
+                            delta0 = tankPosition - raycastHit.point;
+                            delta0.y = 0;
+                        }
                         tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
+                        if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
+                            out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
+                        {
+                            delta1 = tankPosition - raycastHit.point;
+                            delta1.y = 0;
+                        }
+                        tankPlayer.GetComponent<Collider>().enabled = true;
+
+                        if (delta0.magnitude < delta1.magnitude)
+                        {
+                            tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
+                        }
+
+                        Vector3 delta = tankPlayer.transform.forward;
+                        delta.y = 0;
+                        moveDir = delta;
+                        tankPlayer.SimpleMove(moveDir);
                     }
 
-                    Vector3 delta = tankPlayer.transform.forward;
-                    delta.y = 0;
-                    moveDir = delta;
-                    tankPlayer.SimpleMove(moveDir);
+                    else if (toAvoid.GetComponent<BasePlayer>())
+                    {
+                        lazy = Time.time + 0.61f;
+                        agent.isStopped = false;
+                        float radius = 20;
+                        float angle = Random.value * 360;
+                        Vector3 toPosition = toAvoid.transform.position + new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle)) * radius;
+                        toPosition.y = 0;
+                        tankPlayer.MoveTo(toPosition);
+                    }
+
                 }
             }
 
@@ -671,7 +704,53 @@ namespace TanksMP
             {
                 if (agent.isStopped)
                 {
-                    tankPlayer.SimpleMove(moveDir);
+                    if (toAvoid.GetComponent<Bullet>())
+                        tankPlayer.SimpleMove(moveDir);
+                    //else
+                    //{
+                    //    Vector3 random = Random.onUnitSphere;
+                    //    tankPlayer.SimpleMove(new Vector2(random.x, random.z));
+                    //}
+
+                    //RaycastHit raycastHit;
+                    //LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
+                    //float height = tankPlayer.shotPos.position.y;
+                    //Vector3 tankPosition = tankPlayer.transform.TransformPoint(tankPlayer.GetComponent<BoxCollider>().center);
+                    //tankPosition.y = height;
+                    ////lazy = Time.time + 0.41f;
+                    //agent.isStopped = true;
+                    //Vector3 horror = toAvoid.transform.position;
+                    //horror.y = 0;
+                    //tankPlayer.transform.LookAt(horror);
+                    //tankPlayer.transform.Rotate(new Vector3(0, 90, 0));
+                    //Vector3 delta0 = Vector3.zero;
+                    //Vector3 delta1 = Vector3.zero;
+
+                    //tankPlayer.GetComponent<Collider>().enabled = false;
+                    //if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
+                    //     out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
+                    //{
+                    //    delta0 = tankPosition - raycastHit.point;
+                    //    delta0.y = 0;
+                    //}
+                    //tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
+                    //if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
+                    //    out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
+                    //{
+                    //    delta1 = tankPosition - raycastHit.point;
+                    //    delta1.y = 0;
+                    //}
+                    //tankPlayer.GetComponent<Collider>().enabled = true;
+
+                    //if (delta0.magnitude < delta1.magnitude)
+                    //{
+                    //    tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
+                    //}
+
+                    //Vector3 delta = tankPlayer.transform.forward;
+                    //delta.y = 0;
+                    //moveDir = delta;
+                    //tankPlayer.SimpleMove(moveDir);
                 }
             }
 
