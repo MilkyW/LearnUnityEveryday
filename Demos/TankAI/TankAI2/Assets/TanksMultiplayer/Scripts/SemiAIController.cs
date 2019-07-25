@@ -35,9 +35,18 @@ namespace TanksMP
         private Vector2 turnDir = Vector2.zero;
 
         [System.Serializable]
+        public class Arguments
+        {
+            public  float bulletRadius = 0.2f;
+            public float tankWidth = 1.2f;
+        }
+        public Arguments arguments;
+
+        [System.Serializable]
         public class BulletInfo
         {
             public BasePlayer target;
+            public float expireTime;
             public bool inited;
             public bool found;
         }
@@ -78,6 +87,7 @@ namespace TanksMP
                     if (!bi.inited && bullet.owner == tankPlayer.gameObject)
                     {
                         bi.target = lastTargetPlayer;
+                        bi.expireTime = Time.time + bullet.despawnDelay;
                         bi.inited = true;
                     }
                     bi.found = true;
@@ -89,6 +99,7 @@ namespace TanksMP
                     if (bullet.owner == tankPlayer.gameObject)
                     {
                         bi.target = lastTargetPlayer;
+                        bi.expireTime = Time.time + bullet.despawnDelay;
                         bi.inited = true;
                     }
                     bi.found = true;
@@ -105,17 +116,73 @@ namespace TanksMP
 
         private bool WillDie(BasePlayer target)
         {
-            if (target.health > 5)
-                return false;
+            LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
+            int health = target.health;
+            int shield = target.shield;
+            float height = tankPlayer.shotPos.position.y;
+            Vector3 tankPosition = target.transform.TransformPoint(target.GetComponent<BoxCollider>().center);
+            tankPosition.y = height;
+            Vector3 tankVelocity = target.Velocity;
+            tankVelocity.y = 0;
+            float myMinReachTime = (tankPlayer.Position - target.Position).magnitude / bulletSpeed;
+            float minDistance = (arguments.tankWidth * 0.5f + arguments.bulletRadius);
 
             foreach (var bis in bulletInfos)
             {
-                if (bis.Key.enabled && bis.Value.inited && bis.Value.target == target
-                    && target.health < bis.Key.damage + 1)
+                if (bis.Key.enabled && bis.Value.inited && health > 0)
                 {
-                    return true;
+                    Vector3 bulletVelocity = bis.Key.Velocity;
+                    bulletVelocity.y = 0;
+                    Vector3 bulletPosition = bis.Key.transform.TransformPoint(bis.Key.GetComponent<SphereCollider>().center);
+                    bulletPosition.y = height;
+
+                    float maxReachTime = bis.Value.expireTime - Time.time;
+                    RaycastHit raycastHit;
+                    float bulletRadius = 0.25f;
+                    bis.Key.GetComponent<Collider>().enabled = false;
+                    if (Physics.SphereCast(bulletPosition, bulletRadius, bulletVelocity, out raycastHit, bulletSpeed * maxReachTime - 0.2f, layerMask))
+                    {
+                        maxReachTime = (bulletPosition - raycastHit.point).magnitude / bulletSpeed;
+                    }
+                    bis.Key.GetComponent<Collider>().enabled = true;
+
+                    if (maxReachTime < myMinReachTime)
+                    {
+                        Vector3 tankP = tankPosition;
+                        for (float i = 0; i < maxReachTime + Time.fixedDeltaTime; i += Time.fixedDeltaTime)
+                        {
+                            if ((tankP - bulletPosition).magnitude < minDistance)
+                            {
+                                if (shield > 0)
+                                    shield--;
+                                else
+                                    health -= bis.Key.damage;
+                                break;
+                            }
+                            tankP += tankVelocity * Time.fixedDeltaTime;
+                            bulletPosition += bulletVelocity * Time.fixedDeltaTime;
+                        }
+                    }
                 }
             }
+
+            if (health <= 0)
+            {
+                return true;
+            }
+
+            //if (target.health > 5)
+            //    return false;
+
+            //foreach (var bis in bulletInfos)
+            //{
+            //    if (bis.Key.enabled && bis.Value.inited && bis.Value.target == target
+            //        && target.health < bis.Key.damage + 1)
+            //    {
+            //        return true;
+            //    }
+            //}
+
             return false;
         }
 
@@ -142,10 +209,14 @@ namespace TanksMP
             agent.autoBraking = false;
         }
 
+        private void Update()
+        {
+            UpdateBulletInfo();
+        }
+
         protected override void OnFixedUpdate()
         {
             base.OnFixedUpdate();
-            UpdateBulletInfo();
 
 #pragma warning disable 0219
             bool doShoot = false;
@@ -434,11 +505,11 @@ namespace TanksMP
                             target += compVelocity * time;
                             float distance = (target - origin).magnitude;
 #if UNITY_EDITOR
-                            Debug.DrawRay(target, (origin - target).normalized * (distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2), Color.black);
+                            Debug.DrawRay(target, (origin - target).normalized * (distance - arguments.tankWidth * 0.5f), Color.black);
 #endif
                             if (distance < minDistance
                                && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit,
-                               distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2, ~layerMask)
+                               distance - arguments.tankWidth * 0.5f, ~layerMask)
                                || raycastHit.collider.gameObject == tankPlayer.gameObject))
                             {
                                 minDistance = distance;
@@ -520,15 +591,15 @@ namespace TanksMP
         {
             float height = tankPlayer.shotPos.position.y;
             Vector3 origin = tankPlayer.Position;
-            if (agent.isStopped)
+            if (tankPlayer.IsAlive && agent.isStopped)
             {
                 LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
                 RaycastHit raycastHit;
                 if (Physics.Raycast(origin, moveDir, out raycastHit, tankSpeed * Time.fixedDeltaTime, layerMask))
                 {
                     origin = raycastHit.point;
-                    origin.x -= moveDir.normalized.x * (transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).z / 2);
-                    origin.z -= moveDir.normalized.y * (transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).z / 2);
+                    origin.x -= moveDir.normalized.x * arguments.tankWidth * 0.5f;
+                    origin.z -= moveDir.normalized.y * arguments.tankWidth * 0.5f;
                 }
             }
             else
@@ -640,11 +711,11 @@ namespace TanksMP
                             target += compVelocity * time;
                             float distance = (target - origin).magnitude;
 #if UNITY_EDITOR
-                            Debug.DrawRay(target, (origin - target).normalized * (distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2), Color.red);
+                            Debug.DrawRay(target, (origin - target).normalized * (distance - arguments.tankWidth * 0.5f), Color.red);
 #endif
                             if (distance < minDistanceA
                                && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit,
-                               distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2, ~layerMask)
+                               distance - arguments.tankWidth * 0.5f, ~layerMask)
                                || raycastHit.collider.gameObject == tankPlayer.gameObject))
                             {
                                 minDistanceA = distance;
@@ -711,8 +782,8 @@ namespace TanksMP
             if (Physics.Raycast(target, compVelocity, out raycastHit, tankSpeed * Time.fixedDeltaTime, layerMask))
             {
                 target = raycastHit.point;
-                target.x -= compVelocity.normalized.x * (transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).z / 2);
-                target.z -= compVelocity.normalized.y * (transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).z / 2);
+                target.x -= compVelocity.normalized.x * (arguments.tankWidth * 0.5f);
+                target.z -= compVelocity.normalized.y * (arguments.tankWidth * 0.5f);
             }
             target.y = height;
             return target;
@@ -730,7 +801,7 @@ namespace TanksMP
             shootDelta.y = 0;
             Vector3 myNextPos = MyNextPos();
             float shootMore = shootDelta.magnitude;
-            float minDistance = ((tankPlayer.currentBullet == 2) ? 3.0f : 1.0f) * bulletSpeed + shootMore;
+            float minDistance = ((tankPlayer.currentBullet == 2) ? 3.0f : 1.0f) * bulletSpeed;
             float minDistanceB = minDistance;
             float minDistanceW = minDistance * 0.5f;
             Vector3 hitPos = Vector3.zero;
@@ -741,7 +812,7 @@ namespace TanksMP
             {
                 Vector3 origin = myNextPos;
                 var comp = pl.GetComponent<BasePlayer>();
-                if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive)// && !WillDie(comp))
+                if (comp.teamIndex != tankPlayer.teamIndex && comp.IsAlive && !WillDie(comp))
                 {
                     pl.GetComponent<Collider>().enabled = false;
                     Vector3 target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
@@ -787,11 +858,11 @@ namespace TanksMP
                         origin = myNextPos + (target - myNextPos).normalized * shootMore;
                         float distance = (target - origin).magnitude;
 #if UNITY_EDITOR
-                        Debug.DrawRay(target, (origin - target).normalized * (distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2), Color.black);
+                        Debug.DrawRay(target, (origin - target).normalized * (distance - arguments.tankWidth * 0.5f), Color.black);
 #endif
                         if (distance < minDistanceB
                            && (!Physics.SphereCast(target, bulletRadius, origin - target, out raycastHit,
-                           distance - transform.TransformVector(tankPlayer.GetComponent<BoxCollider>().size).x / 2, ~layerMask)
+                           distance - arguments.tankWidth * 0.5f, ~layerMask)
                            || raycastHit.collider.gameObject == tankPlayer.gameObject))
                         {
                             minDistanceB = distance;
@@ -830,7 +901,7 @@ namespace TanksMP
             {
                 Vector3 origin = myNextPos + (hitPos - myNextPos).normalized * shootMore;
 #if UNITY_EDITOR
-                Debug.DrawLine(origin, hitPos, Color.magenta);
+                Debug.DrawLine(origin, hitPos, getTeamColor(tankPlayer.teamIndex));
 #endif
                 currentTarget = hitPos;
                 hitPos -= origin;
