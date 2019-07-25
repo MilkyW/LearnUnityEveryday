@@ -180,7 +180,7 @@ namespace TanksMP
                     RaycastHit raycastHit;
                     float bulletRadius = 0.25f;
                     bis.Key.GetComponent<Collider>().enabled = false;
-                    if (Physics.SphereCast(bulletPosition, bulletRadius, bulletVelocity, out raycastHit, bulletSpeed * maxReachTime - 0.2f, layerMask))
+                    if (Physics.SphereCast(bulletPosition, bulletRadius, bulletVelocity, out raycastHit, bulletSpeed * maxReachTime - 0.2f, ~layerMask))
                     {
                         maxReachTime = (bulletPosition - raycastHit.point).magnitude / bulletSpeed;
                     }
