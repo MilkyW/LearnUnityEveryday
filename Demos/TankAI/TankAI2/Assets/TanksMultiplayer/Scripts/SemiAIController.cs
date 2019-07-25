@@ -496,9 +496,12 @@ namespace TanksMP
 
         private bool AtPos(float timing, ref Vector3[] pos, ref float[] timings, out Vector3 at)
         {
-            at = Vector3.zero;
-            if (timing < 0 || timing > timings[timings.Length - 1])
+            at = pos[0];
+            if (timing > timings[timings.Length - 1])
+            {
+                at = pos[pos.Length - 1];
                 return false;
+            }
 
             for (int i = 1; i < timings.Length; i++)
             {
@@ -846,6 +849,8 @@ namespace TanksMP
         {
             Gizmos.color = getTeamColor(tankPlayer.teamIndex);
             Gizmos.DrawWireSphere(lastTarget, 0.5f);
+            Gizmos.color = Color.black;
+            Gizmos.DrawWireSphere(MyNextPos(), 0.5f);
             if (tankPlayer.bShootable)
             {
                 Vector3 shootDelta = tankPlayer.shotPos.position - tankPlayer.Position;
