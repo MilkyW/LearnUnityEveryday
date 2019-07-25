@@ -441,6 +441,8 @@ namespace TanksMP
                     Vector3 coPosition = iti.Key.transform.position;
                     coPosition.y = 0;
                     float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
+                    if (((PowerupBullet)iti.Key).bulletIndex == 1)
+                        timeCost *= 0.75f;
                     float timeWait = iti.Value.respawnTime - Time.time;
                     if (timeWait > timeCost)
                         timeCost = timeWait;
@@ -472,9 +474,9 @@ namespace TanksMP
 
             if (shield || bullet || health)
             {
-                minShieldTimeCost *= 1.0f * (tankPlayer.health / tankPlayer.maxHealth);
-                minBulletTimeCost *= 1.2f;
-                minHealthTimeCost *= 1.4f * (tankPlayer.health / tankPlayer.maxHealth);
+                minShieldTimeCost *= 1.0f * ((float)tankPlayer.health / tankPlayer.maxHealth);
+                minBulletTimeCost *= 1.3f;
+                minHealthTimeCost *= 1.5f * ((float)tankPlayer.health / tankPlayer.maxHealth);
                 if (minShieldTimeCost < minBulletTimeCost && minShieldTimeCost < minHealthTimeCost)
                 {
                     minCost = minShieldTimeCost;
