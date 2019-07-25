@@ -193,6 +193,8 @@ namespace TanksMP
                     iti.Value.respawnTime
                         = Time.time + ((iti.Key.GetType().Name == "PowerupHealth") ? 10.0f : 15.0f);
                     iti.Value.inited = true;
+                    //Debug.Log(iti.Key.name.ToString() + iti.Value.respawnTime.ToString());
+                    Debug.Log(iti.Value.respawnTime.ToString());
                 }
             }
         }
@@ -465,32 +467,79 @@ namespace TanksMP
                 }
             }
 
+            float minCost = 300;
+            Vector3 target = Vector3.zero;
+
             if (shield || bullet || health)
             {
                 minShieldTimeCost *= 1.0f * (tankPlayer.health / tankPlayer.maxHealth);
                 minBulletTimeCost *= 1.2f;
-                minHealthTimeCost *= 1.3f * (tankPlayer.health / tankPlayer.maxHealth);
+                minHealthTimeCost *= 1.4f * (tankPlayer.health / tankPlayer.maxHealth);
                 if (minShieldTimeCost < minBulletTimeCost && minShieldTimeCost < minHealthTimeCost)
                 {
-                    agent.isStopped = false;
-                    tankPlayer.MoveTo(shield.transform.position);
-                    return;
+                    minCost = minShieldTimeCost;
+                    target = shield.transform.position;
                 }
                 else if (minBulletTimeCost < minHealthTimeCost)
                 {
-                    agent.isStopped = false;
-                    tankPlayer.MoveTo(bullet.transform.position);
-                    return;
+                    minCost = minBulletTimeCost;
+                    target = bullet.transform.position;
                 }
                 else
                 {
-                    agent.isStopped = false;
-                    tankPlayer.MoveTo(health.transform.position);
-                    return;
+                    minCost = minHealthTimeCost;
+                    target = health.transform.position;
                 }
             }
 
+            GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
+            foreach (var pl in allplayer)
+            {
+                BasePlayer player = pl.GetComponent<BasePlayer>();
+                if (player.teamIndex != tankPlayer.teamIndex && player.IsAlive
+                    && player.shield == 0 && player.currentBullet != 1)
+                {
+                    Vector3 plPosition = player.Position;
+                    plPosition.y = 0;
+                    float timeCost = (plPosition - tankPosition).magnitude * 2.0f / tankSpeed;
+                    int points = 0;
+                    int ammo = 0;
+                    if (tankPlayer.currentBullet == 1)
+                    {
+                        if (player.health <= 5)
+                        {
+                            points = 3;
+                            ammo = 1;
+                        }
+                        else if (tankPlayer.ammo > 1 || player.health <= 8)
+                        {
+                            points = 4;
+                            ammo = 2;
+                        }
+                        else
+                        {
+                            points = 5;
+                            ammo = 3;
+                        }
+                    }
+                    else
+                    {
+                        points = (player.health + 2) / 3 + 2;
+                        ammo = (player.health + 2) / 3;
+                    }
+                    timeCost *= ((float)ammo / points);
+                    if (timeCost < minCost)
+                    {
+                        minCost = timeCost;
+                        target = plPosition;
+                    }
+                }
+            }
 
+            agent.isStopped = false;
+            target.y = 0;
+            tankPlayer.MoveTo(target);
+            return;
         }
 
         private Vector3 RotateMouse()
