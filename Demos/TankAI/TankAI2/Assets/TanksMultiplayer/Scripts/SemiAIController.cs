@@ -173,23 +173,22 @@ namespace TanksMP
             foreach (var it in allitem)
             {
                 Collectible co = it.GetComponent<Collectible>();
+                ItemInfo iti = null;
                 if (itemInfos.ContainsKey(co))
                 {
-                    var iti = itemInfos[co];
-                    iti.inited = false;
-                    iti.found = true;
+                    iti = itemInfos[co];
                 }
                 else
                 {
-                    ItemInfo iti = new ItemInfo();
+                    iti = new ItemInfo();
                     itemInfos.Add(co, iti);
-                    iti.inited = false;
-                    iti.found = true;
                 }
+                iti.inited = false;
+                iti.found = true;
             }
             foreach (var iti in itemInfos)
             {
-                if (iti.Value.found == false && iti.Value.inited == false)
+                if (!iti.Value.found && !iti.Value.inited)
                 {
                     iti.Value.respawnTime
                         = Time.time + ((iti.Key.GetType().Name == "PowerupHealth") ? 10.0f : 15.0f);
@@ -466,26 +465,32 @@ namespace TanksMP
                 }
             }
 
-            minBulletTimeCost *= 1.2f;
-            minHealthTimeCost *= 1.5f;
-            if (shield && minShieldTimeCost < minBulletTimeCost && minShieldTimeCost < minHealthTimeCost)
+            if (shield || bullet || health)
             {
-                agent.isStopped = false;
-                tankPlayer.MoveTo(shield.transform.position);
-                return;
+                minShieldTimeCost *= 1.0f * (tankPlayer.health / tankPlayer.maxHealth);
+                minBulletTimeCost *= 1.2f;
+                minHealthTimeCost *= 1.3f * (tankPlayer.health / tankPlayer.maxHealth);
+                if (minShieldTimeCost < minBulletTimeCost && minShieldTimeCost < minHealthTimeCost)
+                {
+                    agent.isStopped = false;
+                    tankPlayer.MoveTo(shield.transform.position);
+                    return;
+                }
+                else if (minBulletTimeCost < minHealthTimeCost)
+                {
+                    agent.isStopped = false;
+                    tankPlayer.MoveTo(bullet.transform.position);
+                    return;
+                }
+                else
+                {
+                    agent.isStopped = false;
+                    tankPlayer.MoveTo(health.transform.position);
+                    return;
+                }
             }
-            else if (bullet && minBulletTimeCost < minHealthTimeCost)
-            {
-                agent.isStopped = false;
-                tankPlayer.MoveTo(bullet.transform.position);
-                return;
-            }
-            else if (health)
-            {
-                agent.isStopped = false;
-                tankPlayer.MoveTo(health.transform.position);
-                return;
-            }
+
+
         }
 
         private Vector3 RotateMouse()
