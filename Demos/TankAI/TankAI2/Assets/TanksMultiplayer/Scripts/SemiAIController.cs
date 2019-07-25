@@ -106,11 +106,9 @@ namespace TanksMP
                     BulletInfo bi = new BulletInfo();
                     bulletInfos.Add(bullet, bi);
                     if (bullet.owner == tankPlayer.gameObject)
-                    {
                         bi.target = lastTargetPlayer;
-                        bi.expireTime = Time.time + bullet.despawnDelay;
-                        bi.inited = true;
-                    }
+                    bi.expireTime = Time.time + bullet.despawnDelay;
+                    bi.inited = true;
                     bi.found = true;
                 }
             }
@@ -165,7 +163,7 @@ namespace TanksMP
             Vector3 tankVelocity = target.Velocity;
             tankVelocity.y = 0;
             float myMinReachTime = (tankPlayer.Position - target.Position).magnitude / bulletSpeed;
-            float minDistance = (arguments.tankWidth * 0.5f + arguments.bulletRadius);
+            float minDistance = (arguments.tankWidth * 0.5f + arguments.bulletRadius + 0.1f);
 
             foreach (var bis in bulletInfos)
             {
@@ -640,7 +638,7 @@ namespace TanksMP
             {
                 LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
                 RaycastHit raycastHit;
-                if (Physics.Raycast(origin, moveDir, out raycastHit, tankSpeed * Time.fixedDeltaTime, layerMask))
+                if (Physics.Raycast(origin, moveDir, out raycastHit, tankSpeed * Time.fixedDeltaTime, ~layerMask))
                 {
                     origin = raycastHit.point;
                     origin.x -= moveDir.normalized.x * arguments.tankWidth * 0.5f;
@@ -824,7 +822,7 @@ namespace TanksMP
             Vector3 target = comp.transform.TransformPoint(comp.GetComponent<BoxCollider>().center);
             Vector3 compVelocity = comp.Velocity;
             //target += compVelocity * Time.fixedDeltaTime;
-            if (Physics.Raycast(target, compVelocity, out raycastHit, tankSpeed * Time.fixedDeltaTime, layerMask))
+            if (Physics.Raycast(target, compVelocity, out raycastHit, tankSpeed * Time.fixedDeltaTime, ~layerMask))
             {
                 target = raycastHit.point;
                 target.x -= compVelocity.normalized.x * (arguments.tankWidth * 0.5f);
