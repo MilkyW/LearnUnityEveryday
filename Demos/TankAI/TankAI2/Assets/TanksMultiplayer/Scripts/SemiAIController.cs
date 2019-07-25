@@ -34,6 +34,8 @@ namespace TanksMP
         private Vector2 moveDir = Vector2.zero;
         private Vector2 turnDir = Vector2.zero;
 
+        private bool startPhase = true;
+
         [System.Serializable]
         public class Arguments
         {
@@ -60,6 +62,15 @@ namespace TanksMP
             public bool found;
         }
         public Dictionary<BasePlayer, EnemyInfo> enemyInfos = new Dictionary<BasePlayer, EnemyInfo>();
+
+        [System.Serializable]
+        public class ItemInfo
+        {
+            public float respawnTime;
+            public bool inited;
+            public bool found;
+        }
+        public Dictionary<Collectible, ItemInfo> itemInfos = new Dictionary<Collectible, ItemInfo>();
 
         private void InitStatistics()
         {
@@ -152,6 +163,41 @@ namespace TanksMP
             }
         }
 
+        private void UpdateItemInfo()
+        {
+            GameObject[] allitem = GameObject.FindGameObjectsWithTag("Powerup");
+            foreach (var iis in itemInfos)
+            {
+                iis.Value.found = false;
+            }
+            foreach (var it in allitem)
+            {
+                Collectible co = it.GetComponent<Collectible>();
+                if (itemInfos.ContainsKey(co))
+                {
+                    var iti = itemInfos[co];
+                    iti.inited = false;
+                    iti.found = true;
+                }
+                else
+                {
+                    ItemInfo iti = new ItemInfo();
+                    itemInfos.Add(co, iti);
+                    iti.inited = false;
+                    iti.found = true;
+                }
+            }
+            foreach (var iti in itemInfos)
+            {
+                if (iti.Value.found == false && iti.Value.inited == false)
+                {
+                    iti.Value.respawnTime
+                        = Time.time + ((iti.Key.GetType().Name == "PowerupHealth") ? 10.0f : 15.0f);
+                    iti.Value.inited = true;
+                }
+            }
+        }
+
         private bool WillDie(BasePlayer target)
         {
             LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
@@ -167,7 +213,7 @@ namespace TanksMP
 
             foreach (var bis in bulletInfos)
             {
-                if (bis.Key.enabled && bis.Value.inited && health > 0)
+                if (bis.Key.gameObject.activeInHierarchy && bis.Value.inited && health > 0)
                 {
                     Vector3 bulletVelocity = bis.Key.Velocity;
                     bulletVelocity.y = 0;
@@ -255,6 +301,7 @@ namespace TanksMP
         {
             UpdateBulletInfo();
             UpdateEnemyInfo();
+            UpdateItemInfo();
         }
 
         protected override void OnFixedUpdate()
@@ -275,10 +322,9 @@ namespace TanksMP
             }
             else if (startAutoTime < Time.time)
             {
-                agent.isStopped = false;
-                tankPlayer.MoveTo(new Vector3(0, 0, 0));
                 //if (agent.path.corners.Length > 1)
                 //    moveDir = agent.path.corners[1] - tankPlayer.Position;
+                MoveWhere(ref turnDir);
             }
             //turnDir = RotateMouse();
             //turnDir = RotateJoystick();
@@ -335,6 +381,110 @@ namespace TanksMP
                 moveDir.x = Input.GetAxis("Horizontal");
                 moveDir.y = Input.GetAxis("Vertical");
                 return true;
+            }
+        }
+
+        private void MoveWhere(ref Vector2 moveDir)
+        {
+            Vector3 tankPosition = tankPlayer.Position;
+            tankPosition.y = 0;
+
+            float minShieldTimeCost = 300;
+            float minBulletTimeCost = 300;
+            float minHealthTimeCost = 300;
+            Collectible shield = null;
+            Collectible bullet = null;
+            Collectible health = null;
+
+            if (startPhase)
+            {
+                foreach (var iti in itemInfos)
+                {
+                    if (iti.Key.GetType().Name == "PowerupShield")
+                    {
+                        shield = iti.Key;
+                        break;
+                    }
+                }
+                if (shield == null || shield.gameObject.activeInHierarchy)
+                {
+                    agent.isStopped = false;
+                    tankPlayer.MoveTo(shield.transform.position);
+                    return;
+                }
+                else
+                {
+                    startPhase = false;
+                }
+            }
+
+            foreach (var iti in itemInfos)
+            {
+                if (iti.Key.GetType().Name == "PowerupShield" && tankPlayer.shield < 3)
+                {
+                    Vector3 coPosition = iti.Key.transform.position;
+                    coPosition.y = 0;
+                    float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
+                    float timeWait = iti.Value.respawnTime - Time.time;
+                    if (timeWait > timeCost)
+                        timeCost = timeWait;
+                    if (timeCost < minShieldTimeCost)
+                    {
+                        minShieldTimeCost = timeCost;
+                        shield = iti.Key;
+                    }
+                }
+
+                else if (iti.Key.GetType().Name == "PowerupBullet" && tankPlayer.currentBullet == 0)
+                {
+                    Vector3 coPosition = iti.Key.transform.position;
+                    coPosition.y = 0;
+                    float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
+                    float timeWait = iti.Value.respawnTime - Time.time;
+                    if (timeWait > timeCost)
+                        timeCost = timeWait;
+                    if (timeCost < minBulletTimeCost)
+                    {
+                        minBulletTimeCost = timeCost;
+                        bullet = iti.Key;
+                    }
+                }
+
+                else if (iti.Key.GetType().Name == "PowerupHealth" && tankPlayer.health < 10)
+                {
+                    Vector3 coPosition = iti.Key.transform.position;
+                    coPosition.y = 0;
+                    float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
+                    float timeWait = iti.Value.respawnTime - Time.time;
+                    if (timeWait > timeCost)
+                        timeCost = timeWait;
+                    if (timeCost < minHealthTimeCost)
+                    {
+                        minHealthTimeCost = timeCost;
+                        health = iti.Key;
+                    }
+                }
+            }
+
+            minBulletTimeCost *= 1.2f;
+            minHealthTimeCost *= 1.5f;
+            if (shield && minShieldTimeCost < minBulletTimeCost && minShieldTimeCost < minHealthTimeCost)
+            {
+                agent.isStopped = false;
+                tankPlayer.MoveTo(shield.transform.position);
+                return;
+            }
+            else if (bullet && minBulletTimeCost < minHealthTimeCost)
+            {
+                agent.isStopped = false;
+                tankPlayer.MoveTo(bullet.transform.position);
+                return;
+            }
+            else if (health)
+            {
+                agent.isStopped = false;
+                tankPlayer.MoveTo(health.transform.position);
+                return;
             }
         }
 
@@ -981,7 +1131,7 @@ namespace TanksMP
 
             for (int i = 0; i < agents.Length; i++)
             {
-                if (agents[i] != null && agents[i].enabled)
+                if (agents[i] != null && agents[i].gameObject.activeInHierarchy)
                 {
                     Gizmos.color = getTeamColor(i);
                     //if (agents[i].GetComponent<BasePlayer>().teamIndex != myTeamIndex)
