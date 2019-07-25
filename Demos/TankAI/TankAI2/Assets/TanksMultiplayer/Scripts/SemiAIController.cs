@@ -37,7 +37,7 @@ namespace TanksMP
         [System.Serializable]
         public class Arguments
         {
-            public  float bulletRadius = 0.2f;
+            public float bulletRadius = 0.2f;
             public float tankWidth = 1.2f;
         }
         public Arguments arguments;
@@ -52,6 +52,14 @@ namespace TanksMP
         }
         public Dictionary<Bullet, BulletInfo> bulletInfos = new Dictionary<Bullet, BulletInfo>();
         public BasePlayer lastTargetPlayer;
+
+        [System.Serializable]
+        public class EnemyInfo
+        {
+            public bool willDie;
+            public bool found;
+        }
+        public Dictionary<BasePlayer, EnemyInfo> enemyInfos = new Dictionary<BasePlayer, EnemyInfo>();
 
         private void InitStatistics()
         {
@@ -84,9 +92,10 @@ namespace TanksMP
                 if (bulletInfos.ContainsKey(bullet))
                 {
                     var bi = bulletInfos[bullet];
-                    if (!bi.inited && bullet.owner == tankPlayer.gameObject)
+                    if (!bi.inited)
                     {
-                        bi.target = lastTargetPlayer;
+                        if (bullet.owner == tankPlayer.gameObject)
+                            bi.target = lastTargetPlayer;
                         bi.expireTime = Time.time + bullet.despawnDelay;
                         bi.inited = true;
                     }
@@ -110,6 +119,37 @@ namespace TanksMP
                 if (bis.Value.found == false)
                 {
                     bis.Value.inited = false;
+                }
+            }
+        }
+
+        private void UpdateEnemyInfo()
+        {
+            GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
+            foreach (var pls in enemyInfos)
+            {
+                pls.Value.found = false;
+            }
+            foreach (var pl in allplayer)
+            {
+                BasePlayer player = pl.GetComponent<BasePlayer>();
+                if (enemyInfos.ContainsKey(player))
+                {
+                    var pi = enemyInfos[player];
+                    pi.found = true;
+                }
+                else
+                {
+                    EnemyInfo ei = new EnemyInfo();
+                    enemyInfos.Add(player, ei);
+                    ei.found = true;
+                }
+            }
+            foreach (var eis in enemyInfos)
+            {
+                if (eis.Value.found == false || !eis.Key.IsAlive)
+                {
+                    eis.Value.willDie = false;
                 }
             }
         }
@@ -168,6 +208,8 @@ namespace TanksMP
 
             if (health <= 0)
             {
+                if (enemyInfos.ContainsKey(target))
+                    enemyInfos[target].willDie = true;
                 return true;
             }
 
@@ -183,6 +225,8 @@ namespace TanksMP
             //    }
             //}
 
+            if (enemyInfos.ContainsKey(target))
+                enemyInfos[target].willDie = false;
             return false;
         }
 
@@ -212,6 +256,7 @@ namespace TanksMP
         private void Update()
         {
             UpdateBulletInfo();
+            UpdateEnemyInfo();
         }
 
         protected override void OnFixedUpdate()
@@ -958,9 +1003,13 @@ namespace TanksMP
                 }
             }
 
-            foreach (var ag in agents)
+            foreach (var eis in enemyInfos)
             {
-
+                if (eis.Value.willDie)
+                {
+                    Gizmos.color = Color.black;
+                    Gizmos.DrawWireCube(eis.Key.Position, new Vector3(3f, 3f, 3f));
+                }
             }
         }
 
