@@ -33,6 +33,7 @@ namespace TanksMP
         //movement variables
         private Vector2 moveDir = Vector2.zero;
         private Vector2 turnDir = Vector2.zero;
+        private float lazy = 0;
 
         private bool startPhase = true;
 
@@ -41,6 +42,7 @@ namespace TanksMP
         {
             public float bulletRadius = 0.2f;
             public float tankWidth = 1.2f;
+            public float tankLength = 1.7f;
         }
         public Arguments arguments;
 
@@ -194,7 +196,7 @@ namespace TanksMP
                         = Time.time + ((iti.Key.GetType().Name == "PowerupHealth") ? 10.0f : 15.0f);
                     iti.Value.inited = true;
                     //Debug.Log(iti.Key.name.ToString() + iti.Value.respawnTime.ToString());
-                    Debug.Log(iti.Value.respawnTime.ToString());
+                    //Debug.Log(iti.Value.respawnTime.ToString());
                 }
             }
         }
@@ -387,160 +389,284 @@ namespace TanksMP
 
         private void MoveWhere(ref Vector2 moveDir)
         {
-            Vector3 tankPosition = tankPlayer.Position;
-            tankPosition.y = 0;
-
-            float minShieldTimeCost = 300;
-            float minBulletTimeCost = 300;
-            float minHealthTimeCost = 300;
-            Collectible shield = null;
-            Collectible bullet = null;
-            Collectible health = null;
-
-            if (startPhase)
+            if (Time.time > lazy)
             {
-                foreach (var iti in itemInfos)
+                Vector3 tankPosition = tankPlayer.Position;
+                tankPosition.y = 0;
+
+                float minShieldTimeCost = 300;
+                float minBulletTimeCost = 300;
+                float minHealthTimeCost = 300;
+                Collectible shield = null;
+                Collectible bullet = null;
+                Collectible health = null;
+
+                if (startPhase)
                 {
-                    if (iti.Key.GetType().Name == "PowerupShield")
+                    foreach (var iti in itemInfos)
                     {
-                        shield = iti.Key;
-                        break;
-                    }
-                }
-                if (shield == null || shield.gameObject.activeInHierarchy)
-                {
-                    agent.isStopped = false;
-                    tankPlayer.MoveTo(shield.transform.position);
-                    return;
-                }
-                else
-                {
-                    startPhase = false;
-                }
-            }
-
-            foreach (var iti in itemInfos)
-            {
-                if (iti.Key.GetType().Name == "PowerupShield" && tankPlayer.shield < 3)
-                {
-                    Vector3 coPosition = iti.Key.transform.position;
-                    coPosition.y = 0;
-                    float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
-                    float timeWait = iti.Value.respawnTime - Time.time;
-                    if (timeWait > timeCost)
-                        timeCost = timeWait;
-                    if (timeCost < minShieldTimeCost)
-                    {
-                        minShieldTimeCost = timeCost;
-                        shield = iti.Key;
-                    }
-                }
-
-                else if (iti.Key.GetType().Name == "PowerupBullet" && tankPlayer.currentBullet == 0)
-                {
-                    Vector3 coPosition = iti.Key.transform.position;
-                    coPosition.y = 0;
-                    float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
-                    if (((PowerupBullet)iti.Key).bulletIndex == 1)
-                        timeCost *= 0.75f;
-                    float timeWait = iti.Value.respawnTime - Time.time;
-                    if (timeWait > timeCost)
-                        timeCost = timeWait;
-                    if (timeCost < minBulletTimeCost)
-                    {
-                        minBulletTimeCost = timeCost;
-                        bullet = iti.Key;
-                    }
-                }
-
-                else if (iti.Key.GetType().Name == "PowerupHealth" && tankPlayer.health < 10)
-                {
-                    Vector3 coPosition = iti.Key.transform.position;
-                    coPosition.y = 0;
-                    float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
-                    float timeWait = iti.Value.respawnTime - Time.time;
-                    if (timeWait > timeCost)
-                        timeCost = timeWait;
-                    if (timeCost < minHealthTimeCost)
-                    {
-                        minHealthTimeCost = timeCost;
-                        health = iti.Key;
-                    }
-                }
-            }
-
-            float minCost = 300;
-            Vector3 target = Vector3.zero;
-
-            if (shield || bullet || health)
-            {
-                minShieldTimeCost *= 1.0f * ((float)tankPlayer.health / tankPlayer.maxHealth);
-                minBulletTimeCost *= 1.3f;
-                minHealthTimeCost *= 1.5f * ((float)tankPlayer.health / tankPlayer.maxHealth);
-                if (minShieldTimeCost < minBulletTimeCost && minShieldTimeCost < minHealthTimeCost)
-                {
-                    minCost = minShieldTimeCost;
-                    target = shield.transform.position;
-                }
-                else if (minBulletTimeCost < minHealthTimeCost)
-                {
-                    minCost = minBulletTimeCost;
-                    target = bullet.transform.position;
-                }
-                else
-                {
-                    minCost = minHealthTimeCost;
-                    target = health.transform.position;
-                }
-            }
-
-            GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
-            foreach (var pl in allplayer)
-            {
-                BasePlayer player = pl.GetComponent<BasePlayer>();
-                if (player.teamIndex != tankPlayer.teamIndex && player.IsAlive
-                    && player.shield == 0 && player.currentBullet != 1)
-                {
-                    Vector3 plPosition = player.Position;
-                    plPosition.y = 0;
-                    float timeCost = (plPosition - tankPosition).magnitude * 2.0f / tankSpeed;
-                    int points = 0;
-                    int ammo = 0;
-                    if (tankPlayer.currentBullet == 1)
-                    {
-                        if (player.health <= 5)
+                        if (iti.Key.GetType().Name == "PowerupShield")
                         {
-                            points = 3;
-                            ammo = 1;
+                            shield = iti.Key;
+                            break;
                         }
-                        else if (tankPlayer.ammo > 1 || player.health <= 8)
-                        {
-                            points = 4;
-                            ammo = 2;
-                        }
-                        else
-                        {
-                            points = 5;
-                            ammo = 3;
-                        }
+                    }
+                    if (shield == null || shield.gameObject.activeInHierarchy)
+                    {
+                        agent.isStopped = false;
+                        tankPlayer.MoveTo(Vector3.zero);
+                        return;
                     }
                     else
                     {
-                        points = (player.health + 2) / 3 + 2;
-                        ammo = (player.health + 2) / 3;
+                        startPhase = false;
                     }
-                    timeCost *= ((float)ammo / points);
-                    if (timeCost < minCost)
+                }
+
+                foreach (var iti in itemInfos)
+                {
+                    if (iti.Key.GetType().Name == "PowerupShield" && tankPlayer.shield < 3)
                     {
-                        minCost = timeCost;
-                        target = plPosition;
+                        Vector3 coPosition = iti.Key.transform.position;
+                        coPosition.y = 0;
+                        float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
+                        float timeWait = iti.Value.respawnTime - Time.time;
+                        if (timeWait > timeCost)
+                            timeCost = timeWait;
+                        if (timeCost < minShieldTimeCost)
+                        {
+                            minShieldTimeCost = timeCost;
+                            shield = iti.Key;
+                        }
                     }
+
+                    else if (iti.Key.GetType().Name == "PowerupBullet" && tankPlayer.currentBullet == 0)
+                    {
+                        Vector3 coPosition = iti.Key.transform.position;
+                        coPosition.y = 0;
+                        float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
+                        if (((PowerupBullet)iti.Key).bulletIndex == 1)
+                            timeCost *= 0.75f;
+                        float timeWait = iti.Value.respawnTime - Time.time;
+                        if (timeWait > timeCost)
+                            timeCost = timeWait;
+                        if (timeCost < minBulletTimeCost)
+                        {
+                            minBulletTimeCost = timeCost;
+                            bullet = iti.Key;
+                        }
+                    }
+
+                    else if (iti.Key.GetType().Name == "PowerupHealth" && tankPlayer.health < 10)
+                    {
+                        Vector3 coPosition = iti.Key.transform.position;
+                        coPosition.y = 0;
+                        float timeCost = (coPosition - tankPosition).magnitude / tankSpeed;
+                        float timeWait = iti.Value.respawnTime - Time.time;
+                        if (timeWait > timeCost)
+                            timeCost = timeWait;
+                        if (timeCost < minHealthTimeCost)
+                        {
+                            minHealthTimeCost = timeCost;
+                            health = iti.Key;
+                        }
+                    }
+                }
+
+                float minCost = 300;
+                Vector3 target = Vector3.zero;
+
+                if (shield || bullet || health)
+                {
+                    minShieldTimeCost *= 1.0f * ((float)tankPlayer.health / tankPlayer.maxHealth);
+                    minBulletTimeCost *= 1.3f;
+                    minHealthTimeCost *= 1.5f * ((float)tankPlayer.health / tankPlayer.maxHealth);
+                    if (minShieldTimeCost < minBulletTimeCost && minShieldTimeCost < minHealthTimeCost)
+                    {
+                        minCost = minShieldTimeCost;
+                        target = shield.transform.position;
+                    }
+                    else if (minBulletTimeCost < minHealthTimeCost)
+                    {
+                        minCost = minBulletTimeCost;
+                        target = bullet.transform.position;
+                    }
+                    else
+                    {
+                        minCost = minHealthTimeCost;
+                        target = health.transform.position;
+                    }
+                }
+
+                GameObject[] allplayer = GameObject.FindGameObjectsWithTag("Player");
+                foreach (var pl in allplayer)
+                {
+                    BasePlayer player = pl.GetComponent<BasePlayer>();
+                    if (player.teamIndex != tankPlayer.teamIndex && player.IsAlive)
+                    {
+                        Vector3 plPosition = player.Position;
+                        plPosition.y = 0;
+                        float timeCost = (plPosition - tankPosition).magnitude * 2.0f / tankSpeed;
+                        int points = 0;
+                        int ammo = player.shield;
+                        if (tankPlayer.currentBullet == 1)
+                        {
+                            if (player.health <= 5)
+                            {
+                                points = 3;
+                                ammo += 1;
+                            }
+                            else if (tankPlayer.ammo > 1 || player.health <= 8)
+                            {
+                                points = 4;
+                                ammo += 2;
+                            }
+                            else
+                            {
+                                points = 5;
+                                ammo += 3;
+                            }
+                        }
+                        else
+                        {
+                            points = (player.health + 2) / 3 + 2;
+                            ammo += (player.health + 2) / 3;
+                        }
+
+                        int hisPoints = 0;
+                        int hisAmmo = tankPlayer.shield;
+                        if (player.currentBullet == 1)
+                        {
+                            if (tankPlayer.health <= 5)
+                            {
+                                hisPoints = 3;
+                                hisAmmo += 1;
+                            }
+                            else if (player.ammo > 1 || tankPlayer.health <= 8)
+                            {
+                                hisPoints = 4;
+                                hisAmmo += 2;
+                            }
+                            else
+                            {
+                                hisPoints = 5;
+                                hisAmmo += 3;
+                            }
+                        }
+                        else
+                        {
+                            hisPoints = (tankPlayer.health + 2) / 3 + 2;
+                            hisAmmo += (tankPlayer.health + 2) / 3;
+                        }
+
+                        if ((float)points / ammo > (float)hisPoints / hisAmmo)
+                        {
+                            timeCost *= ((float)ammo / points);
+                            if (timeCost < minCost)
+                            {
+                                minCost = timeCost;
+                                target = plPosition;
+                            }
+                        }
+
+                    }
+                }
+
+                agent.isStopped = false;
+                target.y = 0;
+                tankPlayer.MoveTo(target);
+
+                RaycastHit raycastHit;
+                LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
+                float height = tankPlayer.shotPos.position.y;
+                tankPosition = tankPlayer.transform.TransformPoint(tankPlayer.GetComponent<BoxCollider>().center);
+                tankPosition.y = height;
+                Vector3 tankVelocity = tankPlayer.Velocity;
+                tankVelocity.y = 0;
+                float minReachTime = 3;
+                float minDistance = (arguments.tankWidth * 0.5f + arguments.bulletRadius + 0.1f);
+                Bullet bl = null;
+
+                foreach (var bis in bulletInfos)
+                {
+                    if (bis.Key.gameObject.activeInHierarchy && bis.Value.inited
+                        && bis.Key.owner.GetComponent<BasePlayer>().teamIndex != tankPlayer.teamIndex)
+                    {
+                        Vector3 bulletVelocity = bis.Key.Velocity;
+                        bulletVelocity.y = 0;
+                        Vector3 bulletPosition = bis.Key.transform.TransformPoint(bis.Key.GetComponent<SphereCollider>().center);
+                        bulletPosition.y = height;
+
+                        float maxReachTime = bis.Value.expireTime - Time.time;
+                        float bulletRadius = 0.25f;
+                        bis.Key.GetComponent<Collider>().enabled = false;
+                        if (Physics.SphereCast(bulletPosition, bulletRadius, bulletVelocity, out raycastHit, bulletSpeed * maxReachTime - 0.2f, ~layerMask))
+                        {
+                            maxReachTime = (bulletPosition - raycastHit.point).magnitude / bulletSpeed;
+                        }
+                        bis.Key.GetComponent<Collider>().enabled = true;
+
+                        Vector3 tankP = tankPosition;
+                        for (float i = 0; i < maxReachTime + Time.fixedDeltaTime && i < minReachTime; i += Time.fixedDeltaTime)
+                        {
+                            if ((tankP - bulletPosition).magnitude < minDistance)
+                            {
+                                bl = bis.Key;
+                                minReachTime = i;
+                            }
+                            tankP += tankVelocity * Time.fixedDeltaTime;
+                            bulletPosition += bulletVelocity * Time.fixedDeltaTime;
+                        }
+                    }
+                }
+
+                if (bl != null)
+                {
+                    lazy = Time.time + 0.6f;
+                    agent.isStopped = true;
+                    Vector3 blPosition = bl.transform.position;
+                    blPosition.y = 0;
+                    tankPlayer.transform.LookAt(blPosition);
+                    tankPlayer.transform.Rotate(new Vector3(0, 90, 0));
+                    Vector3 delta0 = Vector3.zero;
+                    Vector3 delta1 = Vector3.zero;
+
+                    tankPlayer.GetComponent<Collider>().enabled = false;
+                    if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
+                         out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
+                    {
+                        delta0 = tankPosition - raycastHit.point;
+                        delta0.y = 0;
+                    }
+                    tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
+                    if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
+                        out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
+                    {
+                        delta1 = tankPosition - raycastHit.point;
+                        delta1.y = 0;
+                    }
+                    tankPlayer.GetComponent<Collider>().enabled = true;
+
+                    if (delta0.magnitude < delta1.magnitude)
+                    {
+                        tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
+                    }
+
+                    Vector3 delta = tankPlayer.transform.forward;
+                    delta.y = 0;
+                    moveDir = delta;
+                    tankPlayer.SimpleMove(moveDir);
                 }
             }
 
-            agent.isStopped = false;
-            target.y = 0;
-            tankPlayer.MoveTo(target);
+            else
+            {
+                if (agent.isStopped)
+                {
+                    tankPlayer.SimpleMove(moveDir);
+                }
+            }
+
             return;
         }
 
