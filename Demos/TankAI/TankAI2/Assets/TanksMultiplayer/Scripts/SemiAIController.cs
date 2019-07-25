@@ -198,6 +198,11 @@ namespace TanksMP
                     //Debug.Log(iti.Key.name.ToString() + iti.Value.respawnTime.ToString());
                     //Debug.Log(iti.Value.respawnTime.ToString());
                 }
+                if (!iti.Value.found && iti.Value.respawnTime < Time.time)
+                {
+                    iti.Value.respawnTime
+                        = Time.time + ((iti.Key.GetType().Name == "PowerupHealth") ? 10.0f : 15.0f);
+                }
             }
         }
 
@@ -583,6 +588,7 @@ namespace TanksMP
                 tankPosition.y = height;
                 Vector3 tankVelocity = tankPlayer.Velocity;
                 tankVelocity.y = 0;
+                float minAvoidTime = 0.41f;
                 float minReachTime = 3;
                 float minDistance = (arguments.tankWidth * 0.5f + arguments.bulletRadius + 0.1f);
                 Bullet bl = null;
@@ -611,6 +617,8 @@ namespace TanksMP
                         {
                             if ((tankP - bulletPosition).magnitude < minDistance)
                             {
+                                if (i < minAvoidTime)
+                                    break;
                                 bl = bis.Key;
                                 minReachTime = i;
                             }
@@ -622,7 +630,7 @@ namespace TanksMP
 
                 if (bl != null)
                 {
-                    lazy = Time.time + 0.6f;
+                    lazy = Time.time + minReachTime;
                     agent.isStopped = true;
                     Vector3 blPosition = bl.transform.position;
                     blPosition.y = 0;
