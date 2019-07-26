@@ -486,7 +486,7 @@ namespace TanksMP
 
                 if (shield || bullet || health)
                 {
-                    minShieldTimeCost *= 1.0f * ((float)tankPlayer.health / tankPlayer.maxHealth);
+                    minShieldTimeCost *= 1.0f * ((float)tankPlayer.health / tankPlayer.maxHealth) * ((float)tankPlayer.health / tankPlayer.maxHealth);
                     minBulletTimeCost *= 1.3f;
                     minHealthTimeCost *= 1.7f * ((float)tankPlayer.health / tankPlayer.maxHealth);
                     if (minShieldTimeCost < minBulletTimeCost && minShieldTimeCost < minHealthTimeCost)
@@ -517,7 +517,7 @@ namespace TanksMP
                     {
                         Vector3 plPosition = player.Position;
                         plPosition.y = 0;
-                        float timeCost = (plPosition - tankPosition).magnitude * 2.0f / tankSpeed;
+                        float timeCost = (plPosition - tankPosition).magnitude * 2.5f / tankSpeed;
                         int points = 0;
                         int ammo = player.shield;
                         if (tankPlayer.currentBullet == 1)
@@ -570,7 +570,8 @@ namespace TanksMP
                             hisAmmo += (tankPlayer.health + 2) / 3;
                         }
 
-                        if ((float)points / ammo > (float)hisPoints / hisAmmo)
+                        //if ((float)points / ammo > (float)hisPoints / hisAmmo)
+                        if (ammo < hisAmmo && points > hisPoints)
                         {
                             timeCost *= ((float)ammo / points);
                             if (timeCost < minCost)
@@ -580,7 +581,7 @@ namespace TanksMP
                             }
                         }
 
-                        else if (timeCost < 0.41f)
+                        else if (timeCost < Time.fixedDeltaTime * 10 && timeCost < minCost)
                         {
                             toAvoid = player.gameObject;
                             foundHorror = true;
@@ -600,9 +601,9 @@ namespace TanksMP
                 tankPosition.y = height;
                 Vector3 tankVelocity = tankPlayer.Velocity;
                 tankVelocity.y = 0;
-                float minAvoidTime = 0.21f;
+                float minAvoidTime = Time.fixedDeltaTime;
                 float minReachTime = 3;
-                float minDistance = (arguments.tankWidth * 0.5f + arguments.bulletRadius + 0.1f);
+                float minDistance = (arguments.tankLength * 0.5f + arguments.bulletRadius + 0.25f);
 
                 foreach (var bis in bulletInfos)
                 {
@@ -615,16 +616,16 @@ namespace TanksMP
                         bulletPosition.y = height;
 
                         float maxReachTime = bis.Value.expireTime - Time.time;
-                        float bulletRadius = 0.25f;
+                        float bulletRadius = 0.22f;
                         bis.Key.GetComponent<Collider>().enabled = false;
-                        if (Physics.SphereCast(bulletPosition, bulletRadius, bulletVelocity, out raycastHit, bulletSpeed * maxReachTime - 0.2f, ~layerMask))
+                        if (Physics.SphereCast(bulletPosition, bulletRadius, bulletVelocity, out raycastHit, bulletSpeed * maxReachTime, ~layerMask))
                         {
                             maxReachTime = (bulletPosition - raycastHit.point).magnitude / bulletSpeed;
                         }
                         bis.Key.GetComponent<Collider>().enabled = true;
 
                         Vector3 tankP = tankPosition;
-                        for (float i = 0; i < maxReachTime + Time.fixedDeltaTime && i < minReachTime; i += Time.fixedDeltaTime)
+                        for (float i = 0; i < maxReachTime + Time.fixedDeltaTime - 0.001f && i < minReachTime; i += Time.fixedDeltaTime)
                         {
                             if ((tankP - bulletPosition).magnitude < minDistance)
                             {
@@ -675,7 +676,7 @@ namespace TanksMP
                         }
                         tankPlayer.GetComponent<Collider>().enabled = true;
 
-                        if (delta0.magnitude < delta1.magnitude)
+                        if (delta0.magnitude > delta1.magnitude)
                         {
                             tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
                         }
@@ -688,11 +689,12 @@ namespace TanksMP
 
                     else if (toAvoid.GetComponent<BasePlayer>())
                     {
-                        lazy = Time.time + 0.61f;
+                        lazy = Time.time + Time.fixedDeltaTime;
                         agent.isStopped = false;
                         float radius = 20;
                         float angle = Random.value * 360;
-                        Vector3 toPosition = toAvoid.transform.position + new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle)) * radius;
+                        Vector3 toPosition = toAvoid.transform.position
+                            + (tankPlayer.Position - toAvoid.transform.position) * 2 + new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle)) * radius;
                         toPosition.y = 0;
                         tankPlayer.MoveTo(toPosition);
                     }
@@ -705,52 +707,17 @@ namespace TanksMP
                 if (agent.isStopped)
                 {
                     if (toAvoid.GetComponent<Bullet>())
+                    {
                         tankPlayer.SimpleMove(moveDir);
-                    //else
-                    //{
-                    //    Vector3 random = Random.onUnitSphere;
-                    //    tankPlayer.SimpleMove(new Vector2(random.x, random.z));
-                    //}
-
-                    //RaycastHit raycastHit;
-                    //LayerMask layerMask = LayerMask.GetMask("Powerup") | LayerMask.GetMask("Bullet");
-                    //float height = tankPlayer.shotPos.position.y;
-                    //Vector3 tankPosition = tankPlayer.transform.TransformPoint(tankPlayer.GetComponent<BoxCollider>().center);
-                    //tankPosition.y = height;
-                    ////lazy = Time.time + 0.41f;
-                    //agent.isStopped = true;
-                    //Vector3 horror = toAvoid.transform.position;
-                    //horror.y = 0;
-                    //tankPlayer.transform.LookAt(horror);
-                    //tankPlayer.transform.Rotate(new Vector3(0, 90, 0));
-                    //Vector3 delta0 = Vector3.zero;
-                    //Vector3 delta1 = Vector3.zero;
-
-                    //tankPlayer.GetComponent<Collider>().enabled = false;
-                    //if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
-                    //     out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
-                    //{
-                    //    delta0 = tankPosition - raycastHit.point;
-                    //    delta0.y = 0;
-                    //}
-                    //tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
-                    //if (Physics.BoxCast(tankPosition, new Vector3(arguments.tankWidth, height, arguments.tankLength) / 2, tankPlayer.transform.forward,
-                    //    out raycastHit, tankPlayer.transform.rotation, 100, ~layerMask))
-                    //{
-                    //    delta1 = tankPosition - raycastHit.point;
-                    //    delta1.y = 0;
-                    //}
-                    //tankPlayer.GetComponent<Collider>().enabled = true;
-
-                    //if (delta0.magnitude < delta1.magnitude)
-                    //{
-                    //    tankPlayer.transform.Rotate(new Vector3(0, 180, 0));
-                    //}
-
-                    //Vector3 delta = tankPlayer.transform.forward;
-                    //delta.y = 0;
-                    //moveDir = delta;
-                    //tankPlayer.SimpleMove(moveDir);
+                    }
+                }
+                else
+                {
+                    float radius = 20;
+                    float angle = Random.value * 360;
+                    Vector3 toPosition = toAvoid.transform.position + new Vector3(Mathf.Sin(angle), 0, Mathf.Cos(angle)) * radius;
+                    toPosition.y = 0;
+                    tankPlayer.MoveTo(toPosition);
                 }
             }
 
