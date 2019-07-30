@@ -1,7 +1,7 @@
 ### Git Workflow
 **abort changes:**
 
-`git checkout — file`
+`git checkout —- file`
 
 [git撤销修改](https://www.liaoxuefeng.com/wiki/896043488029600/897889638509536)
 
