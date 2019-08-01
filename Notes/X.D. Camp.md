@@ -6,21 +6,18 @@
 
 课题：以坦克大战为背景训练坦克AI，比赛排名（击中和击杀）
 意义：基于Unity(易于上手，基于C#，有大量学习资料)，游戏设计除了AI和Game Play还有其他许多技术如物理和渲染，但那些需要更多的专业知识（研究生），所以将这块抛离出去，专注于编程的乐趣
-血多的血少的蹲点放吃道具？
 
-AI：使用状态机、决策树、机器学习，各种方式，能反映学生差距
+AI：使用状态机、决策树、机器学习各种方式，能反映学生差距
 
 冉庆森 Jack 引擎组负责人 支持自研项目
 
-公司：热情活泼，主要为90后，黄一孟(体育生，从长宁区少科站接触Pascal)、戴云杰开发VeryCD，沈晟CTO射手网络创始人，黄希威，做视频网站起家。
+公司：热情活泼，主要为90后。
 
-姚盛：班主任
+高层：黄一孟(体育生，从长宁区少科站接触Pascal)、戴云杰(开发VeryCD)，沈晟(CTO，射手网络创始人)，黄希威，共同点：做视频网站起家。
 
-袁燕（燕子）：HR
+HR：姚盛(班主任)，袁燕（燕子，总监)，陈佳妮(泥泥)
 
 独立营：48小时独立游戏创作大赛，从可玩性出发，放飞自我，创造真正好玩的游戏。每年12月。
-
-陈佳妮：HR，泥泥
 
 期待墙：培训前写下对本次培训的期待
 
@@ -72,7 +69,7 @@ AI：使用状态机、决策树、机器学习，各种方式，能反映学生
 
 理念：不忘初心 匠心精神 乐于创新
 
-引擎组、技术支撑部、AI组……
+引擎组、技术支撑部、AI Lab……
 
 愿景：
 
@@ -160,7 +157,7 @@ unite框架较易上手。
 
 - 官方文档
 
-- 关注牛人的博客，技术贴（如：[Jackson Dunstan](https://jacksondunstan.com/)）
+- 关注牛人的博客，技术贴（如：[Jackson Dunstan](https://jacksondunstan.com/)
 
 - 参考学习开源项目
 
@@ -318,6 +315,8 @@ UE4的生存时间比U3D长，并发线程多1个
 
 ## Unity 图形渲染基础
 
+[Unity3D渲染基础分享 - Prezi](https://prezi.com/view/v0bYcxT4jo5VmgIKqCpm/)
+
 ### Boat Attack Demo
 
 Unity LWRP Demo: github.com/Verasl/BoatAttack
@@ -398,7 +397,7 @@ Screen Mapping、Direct Light、Base Map、Normal Map、Metallic Map、Receive S
 
 2. Depth Base Color
 
-3. 
+3. Add Wave
 
 4. Specular Map
 

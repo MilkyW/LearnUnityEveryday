@@ -517,17 +517,18 @@ namespace TanksMP
                     {
                         Vector3 plPosition = player.Position;
                         plPosition.y = 0;
-                        float timeCost = (plPosition - tankPosition).magnitude * 2.5f / tankSpeed;
+                        float timeCost = (plPosition - tankPosition).magnitude * 1.0f / tankSpeed;
                         int points = 0;
                         int ammo = player.shield;
-                        if (tankPlayer.currentBullet == 1)
+                        int usefulAmmo = tankPlayer.ammo - ammo;
+                        if (tankPlayer.currentBullet == 1 && usefulAmmo > 0)
                         {
                             if (player.health <= 5)
                             {
                                 points = 3;
                                 ammo += 1;
                             }
-                            else if (tankPlayer.ammo > 1 || player.health <= 8)
+                            else if (usefulAmmo > 1 || player.health <= 8)
                             {
                                 points = 4;
                                 ammo += 2;
@@ -546,14 +547,15 @@ namespace TanksMP
 
                         int hisPoints = 0;
                         int hisAmmo = tankPlayer.shield;
-                        if (player.currentBullet == 1)
+                        usefulAmmo = player.ammo - hisAmmo;
+                        if (player.currentBullet == 1 && usefulAmmo > 0)
                         {
                             if (tankPlayer.health <= 5)
                             {
                                 hisPoints = 3;
                                 hisAmmo += 1;
                             }
-                            else if (player.ammo > 1 || tankPlayer.health <= 8)
+                            else if (usefulAmmo > 1 || tankPlayer.health <= 8)
                             {
                                 hisPoints = 4;
                                 hisAmmo += 2;
