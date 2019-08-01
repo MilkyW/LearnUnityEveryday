@@ -573,7 +573,7 @@ namespace TanksMP
                         }
 
                         //if ((float)points / ammo > (float)hisPoints / hisAmmo)
-                        if (ammo < hisAmmo && points > hisPoints)
+                        if (ammo < hisAmmo && points / (float)ammo > hisPoints / (float)hisAmmo)
                         {
                             timeCost *= ((float)ammo / points);
                             if (timeCost < minCost)
