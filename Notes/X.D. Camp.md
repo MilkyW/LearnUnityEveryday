@@ -1,6 +1,14 @@
 # 2019 X.D. Summer Camp
 
-## 企业介绍
+![Poster](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/Poster.jpg?raw=true)
+
+![Agenda](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/Agenda.jpg?raw=true)
+
+## 介绍
+
+### 课题
+
+![Rules](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/Rules.jpg?raw=true)
 
 技术类专场，通过项目带出更多技术在游戏中应用
 
@@ -9,7 +17,9 @@
 
 AI：使用状态机、决策树、机器学习各种方式，能反映学生差距
 
-冉庆森 Jack 引擎组负责人 支持自研项目
+导师：冉庆森 Jack 引擎组负责人 支持自研项目
+
+### 企业
 
 公司：热情活泼，主要为90后。
 
@@ -61,7 +71,17 @@ HR：姚盛(班主任)，袁燕（燕子，总监)，陈佳妮(泥泥)
 
 2002年至今从400人扩张到600人。
 
+### 产品
+
+![Product00](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/Product00.jpg?raw=true)
+
+![Product01](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/Product01.jpg?raw=true)
+
+![Business](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/Business.jpg?raw=true)
+
 通过**TapTap**发现玩家想要的游戏，通过**心动网络**研发，择优发行到**海外**。
+
+### 文化
 
 使命：聚匠人心 动玩家情
 
