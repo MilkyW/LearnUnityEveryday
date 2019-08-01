@@ -1,0 +1,15 @@
+/Library
+/Temp
+/obj
+/pc
+/.vs
+/Assets/UnityVS.meta
+/Assets/UnityVS/Editor.meta
+/tankai.Editor.csproj
+/tankai.csproj
+/tankai.sln
+/Assembly-CSharp-Editor.csproj
+/Assembly-CSharp.csproj
+/ProjectSettings/NetworkManager.asset
+/ProjectSettings/ProjectVersion.txt
+/host

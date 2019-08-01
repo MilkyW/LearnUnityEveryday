@@ -1,0 +1,61 @@
+**************************************
+CHANGELOG
+**************************************
+v1.4
+- added optional area damage (maxTargets, explosionRange) to Bullet
+- added friendly fire checkbox option to the GameManager
+- added GameMode dropdown to matchmaking selection
+- added logic to load random map for specific game mode
+- added logic to grant points in consideration of game mode & score type
+- added Capture The Flag game mode (+new map: CTF_Game)
+  - renamed Powerups to Collectibles to better describe their versatility
+  - Collectibles can now be consumed or picked up, dropped and returned to their origin
+  - added CollectibleTeam (for flags in CTF) and CollectibleZone class for team bases
+  - Collectibles make use of a new network sync method: buffered RPCs (see documentation)
+- PUN: updated from PUN 1 (Classic) to PUN 2 (v2.9)
+- added Lightweight Render Pipeline (LWRP) dependency
+- minimum Unity version: 2019.1.0​
+
+v1.3.1
+- removed Everplay since Unity deprecated all of its services
+- killedBy variable restructure to avoid NRE in wrong network send order
+- minimum Unity version: 2017.3.0
+
+v1.3
+- added movement on Y axis: added tank gravity, new ramps at the map center
+- added individual (local) kills/death counter to the Game scene
+- added disconnect button to the Game scene for leaving the current match
+- changed bot AI to make more use of the entire map, not heading to the center
+- changed purchasing code to UNITY_PURCHASING define (was UNITY_ANALYTICS)
+- minimum Unity version: 5.6.0
+
+v1.2.2
+- added API compatibility for Unity 5.6
+- PUN: updated for Photon Unity Networking 1.81+
+- PUN: WebGL builds now make use of 'Best Region' setting too
+
+v1.2.1
+- PUN: fixed not connecting to 'Best Region' automatically
+- PUN: fixed missing Unity Ads namespace in GameManager
+- changed rate app url for iTunes and added a warning for default
+
+v1.2
+- added support for Photon Unity Networking (PUN)
+- minimum Unity version: 5.5.0
+
+v1.1
+- added menu item in settings for the desired network mode (online/LAN/offline)
+- added AI bots with player detection when playing in network mode 'offline'
+- added support for automatic LAN discovery, host & join in network mode 'LAN'
+  (when playing in a LAN on desktop Windows/Mac the firewall needs to be disabled)
+- added aim indicator on mobile devices that better visualizes the turret direction
+- changed cursor in editor and standalone builds to a crosshair style cursor
+- fixed shooting imprecision on desktop when playing in a non-square aspect ratio
+- fixed turret jittering where server could overwrite local turret rotation
+
+v1.0.1
+- submitted using clean project to fix falsely detected activation of Unity services
+- added API compatibility for Unity 5.5
+
+v1.0
+- initial version.
