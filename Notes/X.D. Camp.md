@@ -322,14 +322,24 @@ RenderThread
 no reorder：代码的执行顺序，性能差
 
 reorder：
-    Relaxed ordering
-    Release -- acquire
-    Release -- consume
-    memory_order_seq_cst
+
+- Relaxed ordering
+
+- Release -- acquire
+
+- Release -- consume
+
+- memory_order_seq_cst
 
 内存栅栏：可能读到写之前的数据，因为新数据在CPU缓存还没有flush到内存。volatile可以强制刷新。
 
 compare and swap(cas)：用户级原子操作，all or nothing
+
+![Lock Free Stack](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/LockFreeStack.jpg?raw=true)
+
+![ABA problem](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/ABA.jpg?raw=true)
+
+![Solution](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/Solution.jpg?raw=true)
 
 lock free queue & ABA problem
 
@@ -343,6 +353,8 @@ UE4的生存时间比U3D长，并发线程多1个
 
 最新，轻量管线，重点注意
 
+![LWRP Batching](https://github.com/MilkyW/LearnUnityEveryday/blob/master/Pictures/X.D.%20Camp/LWRPBatching.jpg?raw=true)
+
 是否开启Batch调用不同
 
 开启后只需要初始化一次
@@ -355,16 +367,21 @@ UE4的生存时间比U3D长，并发线程多1个
 
 ThreadsafeLinearAllocatorHeader(64Bit)
 
-    blockIndex
-    size
-    overhead
-    magic
+- blockIndex
+
+- size
+
+- overhead
+
+- magic
 
 ThreadsafeLinearAllocatorBlock
 
-    ptr
-    usedSize
-    allocationCount
+- ptr
+
+- usedSize
+
+- allocationCount
 
 特点：threadsafe, fast malloc/unfree, free all, reused bad/big waste, extra memory info
 
@@ -374,14 +391,17 @@ ThreadsafeLinearAllocatorBlock
 
 AtomicPageAllocator
 
-    CPU Cache Line(64 Bytes Align)
-    m_ActivePages
+- CPU Cache Line(64 Bytes Align)
+
+- m_ActivePages
 
 PerThreadPageAllocator
 
-    m_Start
-    m_Offset
-    m_CurrentPageSize
+- m_Start
+
+- m_Offset
+
+- m_CurrentPageSize
 
 特点：malloc very fast, no free/free all, waste memory, little extra memory info
 
@@ -399,10 +419,13 @@ m_BucketGranularityBits
 
 Bucket
 
-    availableBuckets
-    m_LargeBlocks
-    usedBucketsCount
-    blockArray/block头+data
+- availableBuckets
+
+- m_LargeBlocks
+
+- usedBucketsCount
+
+- blockArray/block头+data
 
 特点：fast malloc/free, lock less, extra memory info
 
@@ -412,12 +435,17 @@ Bucket
 
 特点：
 
-    O(1) cost for malloc, free, realloc, memalign
-    Extremely low overhead per allocation (4 bytes)
-    Low overhead per TLSF management of pools (~3kB)
-    Low fragmentation
-    Compiles to only a few kB of code and data
-    Support for adding and removing memory pool regions on the fly
+- O(1) cost for malloc, free, realloc, memalign
+
+- Extremely low overhead per allocation (4 bytes)
+
+- Low overhead per TLSF management of pools (~3kB)
+
+- Low fragmentation
+
+- Compiles to only a few kB of code and data
+
+- Support for adding and removing memory pool regions on the fly
 
 一边申请，一边释放
 
@@ -429,9 +457,11 @@ GetMemoryManager().ThreadInitialize(Thread::RunThreadWrapper)
 
 StackAllocator
 
-    Header/link list
-    ThreadUnSafe
-    overhead
+- Header/link list
+
+- ThreadUnSafe
+
+- overhead
 
 特点：fast malloc/free?, thread safe
 
@@ -441,7 +471,7 @@ m_BucketAllocator
 
 main thread/sub thread
 
-    DynamicHeapAllocator
+- DynamicHeapAllocator
 
 ## Unity 图形渲染基础
 
