@@ -91,7 +91,7 @@ HR：姚盛(班主任)，袁燕（燕子，总监)，陈佳妮(泥泥)
 
 引擎组、技术支撑部、AI Lab……
 
-愿景：
+愿景：成为全球玩家所钟爱的顶级游戏生产商，并拥有最有影响力的游戏平台，并在此过程中，实现个人的价值。
 
 ## Unity引擎介绍
 
@@ -125,13 +125,13 @@ HR：姚盛(班主任)，袁燕（燕子，总监)，陈佳妮(泥泥)
 
 [Bolt](https://assetstore.unity.com/packages/tools/visual-scripting/bolt-87491)
 
-类似Play maker。
+类似[Playmaker](https://assetstore.unity.com/packages/tools/visual-scripting/playmaker-368)的可视化编程插件。
 
 ### Unity的新技术与展望
 
 #### 高性能
 
-综合体，性能分配，如果逻辑省了，渲染就能更好。根据算力能预估效果。
+性能是一个综合体，效果取决于分配，如果逻辑省了，渲染就能更好。根据算力能预估效果。
 
 [DOTS](unity.com/cn/dots)：重置Unity的核心。原本使用面向游戏对象的系统，内存不够连续。
 
@@ -143,7 +143,7 @@ Monobehaviour作为class开销很大。
 
 核心思想：把显示和数据解耦。从面向对象到面向数据。
 
-何时使用？如何做技术选型。
+思考：何时使用？如何做技术选型？
 
 **C#任务系统**：有效利用多核资源，安全多线程。
 
@@ -163,13 +163,11 @@ Unity劣势：缺乏定制优化，发展速度较慢
 
 可编程渲染管线：开发者可以自定义所有的渲染管线(直到OpenGL层面)，自由度较高。
 
-LDRP和HDRP
+LWRP和HDRP
 
 #### Multiplayer
 
 对多人联机游戏来说，网络框架很重要。根据玩法性能需求也不相同。延迟可能会对游戏体验造成很大影响。
-
-Multiplayer
 
 unite框架较易上手。
 
@@ -177,7 +175,7 @@ unite框架较易上手。
 
 - 官方文档
 
-- 关注牛人的博客，技术贴（如：[Jackson Dunstan](https://jacksondunstan.com/)
+- 关注牛人的博客，技术贴，如：[Jackson Dunstan](https://jacksondunstan.com/)
 
 - 参考学习开源项目
 
@@ -193,7 +191,7 @@ unite框架较易上手。
 
 瓶颈在于对底层了解不够深入，或者对软件工程不够了解（如：设计模式、开发工具）
 
-工程：很多人在一起协作，还能发汇更大的效用
+工程：很多人在一起协作，还能发挥更大的效用
 
 做得烦了就要改。不断进步。技术的成长在于点点滴滴和系统学习。
 
@@ -289,25 +287,55 @@ RenderThread
 
 开得越多，bug和数据同步问题越明显
 
+#### 多线程的意义(优势和劣势)
+
+充分利用多核，提高并发性
+
+线程数量的限制问题，只针对同时并发的限制，不限制进程内线程的总数量
+
+提高并发性，用多线程，不一定需要加锁
+
+加锁带来性能的折损(compile optimization, memory reorder)，慎重加锁
+
+最小化加锁(数据的最小化和逻辑的最小化)
+
+用户级等待和内核级等待的各个优势
+
+线程组内的线程压力的平衡性(任务的切分和任务的合并)
+
+通用游戏引擎哪些模块会涉及线程
+
+#### 自旋锁和互斥锁
+
 自旋锁：耗CPU，无切换代价，轻量级操作
 
 互斥锁：从用户层切到内核层，重量级操作
 
-如何选择？
+如何选择？考虑是否一直占用CPU，是否有内核层和用户层之间的切换，轻量/重量逻辑的同步，CPU核的数量。
+
+#### 内存重排
 
 内存重排(memory order/reorder)：正确性和效率，可能会不按代码顺序执行
 
 强制指令，计算依赖关系，不同严格等级不同效率
 
+no reorder：代码的执行顺序，性能差
+
+reorder：
+    Relaxed ordering
+    Release -- acquire
+    Release -- consume
+    memory_order_seq_cst
+
 内存栅栏：可能读到写之前的数据，因为新数据在CPU缓存还没有flush到内存。volatile可以强制刷新。
 
-compare and swap(cas)：原子操作，all or nothing
+compare and swap(cas)：用户级原子操作，all or nothing
 
-lock free queue
+lock free queue & ABA problem
 
 主线程的任务分解成两个线程进行：RenderThread和GameThread
 
-越长越好，并发线程越多越好
+生存周期越长越好，并发线程越多越好
 
 UE4的生存时间比U3D长，并发线程多1个
 
@@ -323,15 +351,97 @@ UE4的生存时间比U3D长，并发线程多1个
 
 加速，快速申请与释放
 
-内存分配器：ThreadsafeLinearAllocator
+#### ThreadsafeLinearAllocator
+
+ThreadsafeLinearAllocatorHeader(64Bit)
+
+    blockIndex
+    size
+    overhead
+    magic
+
+ThreadsafeLinearAllocatorBlock
+
+    ptr
+    usedSize
+    allocationCount
+
+特点：threadsafe, fast malloc/unfree, free all, reused bad/big waste, extra memory info
 
 申请连续内存
 
+#### PerThreadPageAllocator
+
+AtomicPageAllocator
+
+    CPU Cache Line(64 Bytes Align)
+    m_ActivePages
+
+PerThreadPageAllocator
+
+    m_Start
+    m_Offset
+    m_CurrentPageSize
+
+特点：malloc very fast, no free/free all, waste memory, little extra memory info
+
 只申请不释放，结束时才会一次性释放
 
-内存分配器：BucketAllocator
+#### BucketAllocator
+
+m_LargeBlocks
+
+m_NewLargeBlockMutex
+
+m_Buckets
+
+m_BucketGranularityBits
+
+Bucket
+
+    availableBuckets
+    m_LargeBlocks
+    usedBucketsCount
+    blockArray/block头+data
+
+特点：fast malloc/free, lock less, extra memory info
+
+#### DynamicHeapAllocator
+
+([tlsf](https://github.com/mattconte/tlsf))Two-Level Segregated Fit Memory allocator
+
+特点：
+
+    O(1) cost for malloc, free, realloc, memalign
+    Extremely low overhead per allocation (4 bytes)
+    Low overhead per TLSF management of pools (~3kB)
+    Low fragmentation
+    Compiles to only a few kB of code and data
+    Support for adding and removing memory pool regions on the fly
 
 一边申请，一边释放
+
+#### TLSAllocator
+
+PlatformThreadSpecificValue
+
+GetMemoryManager().ThreadInitialize(Thread::RunThreadWrapper)
+
+StackAllocator
+
+    Header/link list
+    ThreadUnSafe
+    overhead
+
+特点：fast malloc/free?, thread safe
+
+#### DualThreadAllocator
+
+m_BucketAllocator
+
+main thread/sub thread
+
+    DynamicHeapAllocator
 
 ## Unity 图形渲染基础
 
